@@ -1,7 +1,5 @@
 package me.oriharel.seriemanager.dao.broadcast
 
-import com.beust.klaxon.JsonObject
-import me.oriharel.seriemanager.model.content.Broadcast
 import me.oriharel.seriemanager.model.content.SerializedBroadcast
 import org.json.JSONObject
 import java.util.*

@@ -1,9 +1,7 @@
 package me.oriharel.seriemanager.service
 
-import com.beust.klaxon.JsonObject
 import me.oriharel.seriemanager.dao.broadcast.BroadcastDao
 import me.oriharel.seriemanager.dao.broadcast.SearchType
-import me.oriharel.seriemanager.model.content.Broadcast
 import me.oriharel.seriemanager.model.content.SerializedBroadcast
 import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired

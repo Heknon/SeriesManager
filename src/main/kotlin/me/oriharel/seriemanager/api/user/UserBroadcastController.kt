@@ -3,14 +3,12 @@ package me.oriharel.seriemanager.api.user
 import me.oriharel.seriemanager.model.content.SerializedBroadcast
 import me.oriharel.seriemanager.service.BroadcastService
 import me.oriharel.seriemanager.service.UserService
-import org.apache.coyote.Response
-import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
-import javax.validation.*
+import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 

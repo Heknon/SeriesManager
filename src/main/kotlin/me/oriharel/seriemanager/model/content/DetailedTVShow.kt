@@ -6,8 +6,6 @@ import me.oriharel.seriemanager.model.entity.Language
 import me.oriharel.seriemanager.model.entity.Person
 import me.oriharel.seriemanager.model.entity.company.Network
 import me.oriharel.seriemanager.model.entity.company.ProductionCompany
-import me.oriharel.seriemanager.model.entity.person.CrewMember
-import me.oriharel.seriemanager.model.entity.person.GuestStar
 
 class DetailedTVShow(
         @JsonProperty val createdBy: Person,
