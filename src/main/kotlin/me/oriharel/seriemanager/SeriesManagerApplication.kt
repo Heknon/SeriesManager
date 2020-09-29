@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class SeriesManagerApplication
 
 fun main(args: Array<String>) {
-	runApplication<SeriesManagerApplication>(*args)
+    runApplication<SeriesManagerApplication>(*args)
 }
