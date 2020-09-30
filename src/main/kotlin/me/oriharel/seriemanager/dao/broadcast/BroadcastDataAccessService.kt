@@ -1,44 +1,65 @@
 package me.oriharel.seriemanager.dao.broadcast
 
-import me.oriharel.seriemanager.model.content.SerializedBroadcast
+import me.oriharel.seriemanager.Routes
+import me.oriharel.seriemanager.model.content.*
+import me.oriharel.seriemanager.utility.Mapper
 import me.oriharel.seriemanager.utility.convertURLJsonResponse
-import org.json.JSONObject
+import me.oriharel.seriemanager.utility.getJsonObject
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Repository("broadcastDao")
 class BroadcastDataAccessService : BroadcastDao {
-    override fun getDetailedBroadcasts(vararg serializedBroadcast: SerializedBroadcast): List<Optional<JSONObject>> {
-        return serializedBroadcast.map { getDetailedBroadcast(it) }
+    override fun <T> getDetailedBroadcasts(vararg serializedBroadcast: SerializedBroadcast): List<Optional<T>> {
+        return serializedBroadcast.map { getDetailedBroadcast<T>(it) }
     }
 
-    override fun getDetailedBroadcast(serializedBroadcast: SerializedBroadcast): Optional<JSONObject> {
+    override fun <T> getDetailedBroadcast(serializedBroadcast: SerializedBroadcast): Optional<T> {
         return when (serializedBroadcast.type) {
-            "movie" -> Optional.of(getMovieEndpoint(serializedBroadcast.tmdbId!!).convertURLJsonResponse())
-            "tv" -> Optional.of(getTVShowEndpoint(serializedBroadcast.tmdbId!!).convertURLJsonResponse())
+            "movie" -> Optional.of(getMovieEndpoint(serializedBroadcast.id
+                    ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedMovie>() as T)
+            "tv" -> Optional.of(getTVShowEndpoint(serializedBroadcast.id
+                    ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedTVShow>() as T)
             else -> Optional.empty()
         }
     }
 
-    override fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): JSONObject {
-        return getSearchEndpoint(searchType, query, page, adult).convertURLJsonResponse()
+    override fun <T : Broadcast> findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<T?> {
+        val url = getSearchEndpoint(searchType, query, page, adult)
+        val jo = url.getJsonObject().getJSONArray("results")
+        val results = mutableListOf<Broadcast?>()
+
+        for (i in 0 until jo.length()) {
+            val o = jo.getJSONObject(i)
+            val mediaType = o["media_type"]
+            if (mediaType == "tv" || mediaType == "movie") {
+                val oAsStr = o.toString(0)
+                results.add(
+                        when (mediaType) {
+                            "movie" -> Mapper.mapper.readValue<Movie>(oAsStr, Movie::class.java)
+                            "tv" -> Mapper.mapper.readValue<TVShow>(oAsStr, TVShow::class.java)
+                            else -> null
+                        }
+                )
+            }
+        }
+
+        return results as List<T?>
     }
 
     companion object {
-        private const val API_KEY = "e721a557dd172dbdaf21acbec3976df2"
-        private const val BASE_URL = "https://api.themoviedb.org/3"
-        private const val ENDPOINT_END = "api_key=$API_KEY&language=en-US"
-
         private fun getTVShowEndpoint(id: Int): String {
-            return "$BASE_URL/tv/${id}?api_key=$API_KEY&language=en-US"
+            return "${Routes.BASE_URL}/tv/${id}?api_key=${Routes.API_KEY}&language=en-US"
         }
 
         private fun getMovieEndpoint(id: Int): String {
-            return "$BASE_URL/movie/${id}?$ENDPOINT_END"
+            return "${Routes.BASE_URL}/movie/${id}?${Routes.ENDPOINT_END}"
         }
 
         private fun getSearchEndpoint(searchType: SearchType, query: String, page: Int, adult: Boolean): String {
-            return "$BASE_URL/search/${searchType.name}?query=${query}&page=${page}&include_adult=${adult}&$ENDPOINT_END"
+            return "${Routes.BASE_URL}/search/${searchType.name.toLowerCase()}?query=${query}&page=${page}&include_adult=${adult}&${Routes.ENDPOINT_END}"
         }
     }
 }

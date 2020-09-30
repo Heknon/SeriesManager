@@ -1,5 +1,7 @@
 package me.oriharel.seriemanager.api.user
 
+import me.oriharel.seriemanager.dao.broadcast.SearchType
+import me.oriharel.seriemanager.model.content.Broadcast
 import me.oriharel.seriemanager.model.content.SerializedBroadcast
 import me.oriharel.seriemanager.service.BroadcastService
 import me.oriharel.seriemanager.service.UserService
@@ -20,13 +22,18 @@ class UserBroadcastController @Autowired constructor(private val userService: Us
         return userService.getBroadcasts(userId)
     }
 
-    @GetMapping("/detailed")
-    fun getDetailedBroadcasts(@PathVariable("userId") userId: UUID): List<MutableMap<String, Any>?> {
+    @GetMapping(path = ["/search/{type}"])
+    fun searchBroadcasts(@PathVariable("type") type: SearchType, @RequestParam page: Int, @RequestParam query: String, @RequestParam adult: Boolean): List<Broadcast?> {
+        return broadcastService.findBroadcasts(type, query, page, adult)
+    }
+
+    @GetMapping(path = ["/detailed"])
+    fun getDetailedBroadcasts(@PathVariable("userId") userId: UUID): List<Broadcast?> {
         val optional = userService.getBroadcasts(userId)
         if (optional.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Broadcasts not found!")
-        return broadcastService.getDetailedBroadcasts(*optional.get().toTypedArray()).map {
+        return broadcastService.getDetailedBroadcasts<Broadcast>(*optional.get().toTypedArray()).map {
             if (it.isEmpty) return@map null
-            else it.get().toMap()
+            else it.get()
         }
     }
 
@@ -38,12 +45,12 @@ class UserBroadcastController @Autowired constructor(private val userService: Us
     }
 
     @GetMapping(path = ["/{id}/detailed"])
-    fun getDetailedBroadcast(@PathVariable("userId") userId: UUID, @PathVariable("id") id: Int): MutableMap<String, Any>? {
+    fun getDetailedBroadcast(@PathVariable("userId") userId: UUID, @PathVariable("id") id: Int): Broadcast {
         val optional = userService.getBroadcastById(userId, id)
         if (optional.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Broadcast not found!")
-        val optionalBC = broadcastService.getDetailedBroadcast(optional.get())
+        val optionalBC: Optional<Broadcast> = broadcastService.getDetailedBroadcast(optional.get())
         if (optional.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Wrong TMDB ID!")
-        return optionalBC.get().toMap()
+        return optionalBC.get()
     }
 
     @PostMapping

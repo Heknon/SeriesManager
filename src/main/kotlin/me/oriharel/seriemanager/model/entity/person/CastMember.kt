@@ -11,4 +11,6 @@ data class CastMember(
         @JsonProperty override val name: String,
         @JsonProperty val order: Int,
         @JsonProperty override val profile: String
-) : Person(id, creditId, name, gender, profile)
+) : Person(id, creditId, name, gender, profile) {
+    constructor() : this("", "", -1, -1, "", -1, "")
+}

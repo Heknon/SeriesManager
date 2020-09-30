@@ -11,4 +11,6 @@ data class GuestStar(
         @JsonProperty val order: Int,
         @JsonProperty override val gender: Int,
         @JsonProperty override val profile: String
-) : Person(id, creditId, name, gender, profile)
+) : Person(id, creditId, name, gender, profile) {
+    constructor() : this(-1, "", "", "", -1, -1, "")
+}

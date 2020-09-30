@@ -49,7 +49,7 @@ class UserDataAccessService : UserDao {
         if (user.isEmpty) {
             return Optional.empty()
         }
-        return user.get().broadcasts.stream().filter { it.tmdbId == broadcastId }.findFirst()
+        return user.get().broadcasts.stream().filter { it.id == broadcastId }.findFirst()
     }
 
     override fun addBroadcast(id: UUID, broadcast: SerializedBroadcast): Optional<SerializedBroadcast> {
@@ -69,7 +69,7 @@ class UserDataAccessService : UserDao {
             return Optional.empty()
         }
         val user = userOptional.get()
-        user.broadcasts.removeIf { it.tmdbId == broadcastId }
+        user.broadcasts.removeIf { it.id == broadcastId }
         val bc = SerializedBroadcast(broadcastId, broadcast)
         user.broadcasts.add(bc)
         repository.save(user)
@@ -82,7 +82,7 @@ class UserDataAccessService : UserDao {
             return Optional.empty()
         }
         val user = userOptional.get()
-        val bc = user.broadcasts.filter { it.tmdbId == broadcastId }[0]
+        val bc = user.broadcasts.filter { it.id == broadcastId }[0]
         user.broadcasts.remove(bc)
         repository.save(user)
         return Optional.of(bc)

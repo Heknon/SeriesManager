@@ -16,4 +16,5 @@ class User(
 ) {
     constructor(user: User) : this(user.id, user.email, user.name, user.broadcasts)
     constructor(id: UUID, user: User) : this(id, user.email, user.name, user.broadcasts)
+    constructor() : this(null, "", "", mutableListOf())
 }

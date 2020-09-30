@@ -1,7 +1,15 @@
 package me.oriharel.seriemanager.model.entity
 
-abstract class Person(override val id: Int,
-                      open val creditId: String,
-                      override val name: String,
-                      open val gender: Int,
-                      open val profile: String) : Entity
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
+import me.oriharel.seriemanager.Routes
+
+open class Person @JsonCreator constructor(
+        @JsonProperty("id") override val id: Int,
+        @JsonProperty("credit_id") open val creditId: String,
+        @JsonProperty("name") override val name: String,
+        @JsonProperty("gender") open val gender: Int,
+        @JsonProperty("profile_path") open val profile: String
+) : Entity {
+    val profileUrl = "${Routes.IMAGES_API}$profile"
+}
