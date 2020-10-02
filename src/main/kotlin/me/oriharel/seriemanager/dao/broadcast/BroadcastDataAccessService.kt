@@ -12,21 +12,31 @@ import java.util.*
 
 @Repository("broadcastDao")
 class BroadcastDataAccessService : BroadcastDao {
-    override fun <T> getDetailedBroadcasts(vararg serializedBroadcast: SerializedBroadcast): List<Optional<T>> {
-        return serializedBroadcast.map { getDetailedBroadcast<T>(it) }
+    override fun getDetailedBroadcasts(vararg serializedBroadcast: UserSerializedBroadcast): List<Optional<Broadcast>> {
+        return serializedBroadcast.map { getDetailedBroadcast(it) }
     }
 
-    override fun <T> getDetailedBroadcast(serializedBroadcast: SerializedBroadcast): Optional<T> {
-        return when (serializedBroadcast.type) {
-            "movie" -> Optional.of(getMovieEndpoint(serializedBroadcast.id
-                    ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedMovie>() as T)
-            "tv" -> Optional.of(getTVShowEndpoint(serializedBroadcast.id
-                    ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedTVShow>() as T)
-            else -> Optional.empty()
+    override fun getDetailedBroadcast(serializedBroadcast: UserSerializedBroadcast): Optional<Broadcast> {
+        val broadcast: Broadcast = when (serializedBroadcast.type) {
+            "movie" -> getMovieEndpoint(serializedBroadcast.id
+                    ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedMovie>()
+            "tv" -> getTVShowEndpoint(serializedBroadcast.id
+                    ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedTVShow>()
+            else -> return Optional.empty()
         }
+
+        var episodesWatched = 0
+        serializedBroadcast.watched?.forEach {
+            it.value.forEach { s ->
+                episodesWatched += s
+            }
+        }
+
+        broadcast.watched = broadcast.broadcastCount <= episodesWatched
+        return Optional.of(broadcast)
     }
 
-    override fun <T : Broadcast> findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<T?> {
+    override fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast?> {
         val url = getSearchEndpoint(searchType, query, page, adult)
         val jo = url.getJsonObject().getJSONArray("results")
         val results = mutableListOf<Broadcast?>()
@@ -46,7 +56,65 @@ class BroadcastDataAccessService : BroadcastDao {
             }
         }
 
-        return results as List<T?>
+        return results
+    }
+
+    override fun showEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast): Int {
+        val bc = getDetailedBroadcast(serializedBroadcast).get()
+        return bc.broadcastCount - serializedBroadcast.totalEpisodesWatched
+    }
+
+    override fun seasonEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast, season: Short): Int {
+        val bc = getDetailedBroadcast(serializedBroadcast).get() as DetailedTVShow
+        return bc.seasons[season.toInt()].episodeCount - (serializedBroadcast.watched?.get(season)?.count() ?: 0)
+    }
+
+    override fun seasonEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast, vararg season: Short): Map<Short, Int> {
+        val bc = getDetailedBroadcast(serializedBroadcast).get() as DetailedTVShow
+        val map = mutableMapOf<Short, Int>()
+
+        season.forEach {
+            map[it] = bc.seasons[it.toInt()].episodeCount - (serializedBroadcast.watched?.get(it)?.count() ?: 0)
+        }
+
+        return map
+    }
+
+    override fun episodeIsWatched(serializedBroadcast: UserSerializedBroadcast, season: Short, vararg episode: Short): Boolean {
+        return serializedBroadcast.watched?.get(season)?.containsAll(episode.toList()) == true
+    }
+
+    override fun movieIsWatched(vararg serializedBroadcast: UserSerializedBroadcast): Boolean {
+        serializedBroadcast.forEach {
+            if (it.watched?.get(1)?.contains(1) == false) return false
+        }
+
+        return true
+    }
+
+    override fun getBroadcastsWatchStatus(vararg serializedBroadcast: UserSerializedBroadcast): Map<Broadcast, Map<Broadcast, Boolean>> {
+        val broadcasts = getDetailedBroadcasts(*serializedBroadcast)
+        val idSerializedMap = serializedBroadcast.associateBy { it.id }
+        val result = mutableMapOf<Broadcast, Map<Broadcast, Boolean>>()
+
+        broadcasts.forEach { broadcast ->
+            val bc = broadcast.get()
+            if (bc is DetailedMovie) {
+                result[bc] = mutableMapOf(Pair(bc as Broadcast, bc.watched))
+            } else if (bc is DetailedTVShow) {
+                bc.seasons.forEach { season ->
+                    season.episodes?.forEach {
+                        result[bc] = mutableMapOf(Pair(it as Broadcast, episodeIsWatched(
+                                idSerializedMap[bc.id]!!,
+                                season.seasonNumber.toShort(),
+                                it.episodeNumber.toShort()
+                        )))
+                    }
+                }
+            }
+        }
+
+        return result
     }
 
     companion object {

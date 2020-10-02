@@ -11,5 +11,5 @@ open class Person @JsonCreator constructor(
         @JsonProperty("gender") open val gender: Int,
         @JsonProperty("profile_path") open val profile: String
 ) : Entity {
-    val profileUrl = "${Routes.IMAGES_API}$profile"
+    val profileUrl get() = "${Routes.IMAGES_API}$profile"
 }

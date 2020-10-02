@@ -1,12 +1,14 @@
 package me.oriharel.seriemanager.model.content
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.datetime.Instant
 import me.oriharel.seriemanager.model.entity.Country
 import me.oriharel.seriemanager.model.entity.Language
 import me.oriharel.seriemanager.model.entity.company.ProductionCompany
 
+@JsonIgnoreProperties(value = ["watched"])
 class DetailedMovie @JsonCreator constructor(
         @JsonProperty("belongs_to_collection") val belongsToCollection: Any?,
         @JsonProperty("budget") val budget: Int,
@@ -49,5 +51,7 @@ class DetailedMovie @JsonCreator constructor(
         releaseDate,
         voteCount,
         name,
-        watched
+        "movie",
+        watched,
+        1
 ), DetailedBroadcast

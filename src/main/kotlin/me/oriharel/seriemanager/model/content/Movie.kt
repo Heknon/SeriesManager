@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.datetime.Instant
 import me.oriharel.seriemanager.Routes
 
-@JsonIgnoreProperties("media_type")
+@JsonIgnoreProperties(value = ["watched", "broadcast_count"])
 open class Movie @JsonCreator constructor(
         @JsonProperty("adult") val adult: Boolean,
         @JsonProperty("video") val video: Boolean,
@@ -22,7 +22,9 @@ open class Movie @JsonCreator constructor(
         @JsonProperty("release_date") override val releaseDate: Instant,
         @JsonProperty("vote_count") override val voteCount: Int,
         @JsonProperty("title") override val name: String,
-        @JsonProperty("watched") override val watched: Boolean
+        @JsonProperty("media_type", defaultValue = "movie") val type: String,
+        @JsonProperty("watched") override var watched: Boolean,
+        @JsonProperty("broadcast_count") override val broadcastCount: Int = 1
 ) : Broadcast(
         id,
         poster,
@@ -31,6 +33,7 @@ open class Movie @JsonCreator constructor(
         voteAverage,
         voteCount,
         watched,
+        broadcastCount,
         releaseDate
 ) {
     val backdropUrl = "${Routes.IMAGES_API}$backdrop"

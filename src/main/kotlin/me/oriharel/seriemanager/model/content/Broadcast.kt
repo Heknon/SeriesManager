@@ -5,6 +5,9 @@ import kotlinx.datetime.Instant
 import me.oriharel.seriemanager.Routes
 import org.springframework.data.annotation.Id
 
+/**
+ * @property watched only works with DetailedTVShow and Movie
+ */
 abstract class Broadcast(
         @Id @JsonProperty("id") open val id: Int,
         @JsonProperty("poster_path") open val poster: String?,
@@ -12,8 +15,9 @@ abstract class Broadcast(
         @JsonProperty("name") open val name: String,
         @JsonProperty("vote_average") open val voteAverage: Double,
         @JsonProperty("vote_count") open val voteCount: Int,
-        @JsonProperty("watched") open val watched: Boolean,
+        @JsonProperty("watched") open var watched: Boolean,
+        @JsonProperty("broadcast_count") open val broadcastCount: Int,
         open val releaseDate: Instant
 ) {
-    val posterUrl = "${Routes.IMAGES_API}$poster"
+    val posterUrl get() = "${Routes.IMAGES_API}$poster"
 }

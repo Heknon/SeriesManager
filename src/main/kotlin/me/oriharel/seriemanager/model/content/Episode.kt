@@ -1,11 +1,13 @@
 package me.oriharel.seriemanager.model.content
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.datetime.Instant
 import me.oriharel.seriemanager.model.entity.person.CrewMember
 import me.oriharel.seriemanager.model.entity.person.GuestStar
 
+@JsonIgnoreProperties(value = ["watched", "broadcastCount"])
 class Episode @JsonCreator constructor(
         @JsonProperty("air_date") override val releaseDate: Instant,
         @JsonProperty("crew") val crew: List<CrewMember>?,
@@ -20,7 +22,8 @@ class Episode @JsonCreator constructor(
         @JsonProperty("still_path") override val poster: String?,
         @JsonProperty("vote_average") override val voteAverage: Double,
         @JsonProperty("vote_count") override val voteCount: Int,
-        @JsonProperty("watched") override val watched: Boolean
+        @JsonProperty("watched") override var watched: Boolean,
+        @JsonProperty("broadcast_count") override val broadcastCount: Int = 1
 ) : Broadcast(
         id,
         poster,
@@ -29,5 +32,6 @@ class Episode @JsonCreator constructor(
         voteAverage,
         voteCount,
         watched,
+        broadcastCount,
         releaseDate
 )
