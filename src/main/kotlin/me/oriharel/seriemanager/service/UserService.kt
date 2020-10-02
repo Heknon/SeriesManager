@@ -1,5 +1,6 @@
 package me.oriharel.seriemanager.service
 
+import me.oriharel.seriemanager.api.response.AuthRequest
 import me.oriharel.seriemanager.dao.user.UserDao
 import me.oriharel.seriemanager.model.User
 import me.oriharel.seriemanager.model.content.UserSerializedBroadcast
@@ -64,6 +65,10 @@ class UserService @Autowired constructor(@Qualifier("userDao") private val userD
             return userDao.markMovieUnwatched(id, serializedBroadcast)
         }
         return userDao.markBroadcastUnwatched(id, serializedBroadcast, season, *episode)
+    }
+
+    fun generateJwtToken(authRequest: AuthRequest): String {
+        return userDao.generateJwtToken(authRequest)
     }
 
     fun getSerializedBroadcast(

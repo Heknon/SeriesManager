@@ -13,8 +13,9 @@ class User(
         @NotNull @JsonProperty val email: String,
         @NotNull @JsonProperty val name: String,
         @JsonProperty val broadcasts: MutableSet<UserSerializedBroadcast> = mutableSetOf(),
+        @NotNull @JsonProperty val username: String,
+        @NotNull val password: String,
 ) {
-    constructor(user: User) : this(user.id, user.email, user.name, user.broadcasts)
-    constructor(id: UUID, user: User) : this(id, user.email, user.name, user.broadcasts)
-    constructor() : this(null, "", "", mutableSetOf())
+    constructor(id: UUID, user: me.oriharel.seriemanager.model.User) : this(id, user.email, user.name, user.broadcasts, user.username, user.password)
+    constructor() : this(null, "", "", mutableSetOf(), "", "")
 }

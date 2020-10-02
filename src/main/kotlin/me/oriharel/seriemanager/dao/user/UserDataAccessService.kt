@@ -1,9 +1,13 @@
 package me.oriharel.seriemanager.dao.user
 
+import me.oriharel.seriemanager.api.response.AuthRequest
 import me.oriharel.seriemanager.model.User
 import me.oriharel.seriemanager.model.content.UserSerializedBroadcast
+import me.oriharel.seriemanager.security.JwtUtility
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Repository
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
@@ -13,6 +17,12 @@ class UserDataAccessService : UserDao {
 
     @Autowired
     lateinit var repository: UserRepository
+
+    @Autowired
+    lateinit var jwtUtility: JwtUtility
+
+    @Autowired
+    lateinit var authManager: AuthenticationManager
 
     override fun addUser(user: User): User {
         return repository.insert(User(UUID.randomUUID(), user))
@@ -43,6 +53,7 @@ class UserDataAccessService : UserDao {
         if (user.isEmpty) {
             return Optional.empty()
         }
+
         return Optional.of(user.get().broadcasts)
     }
 
@@ -126,6 +137,16 @@ class UserDataAccessService : UserDao {
         return true
     }
 
+    override fun generateJwtToken(authRequest: AuthRequest): String {
+        try {
+            authManager.authenticate(UsernamePasswordAuthenticationToken(authRequest.username, authRequest.password))
+        } catch (ex: Exception) {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password")
+        }
+
+        return jwtUtility.generateToken(authRequest.username, if (authRequest.stayLoggedIn == true) 1000000 else 10)
+    }
+
     fun updateSerializedBroadcast(id: UUID, serializedBroadcast: UserSerializedBroadcast) {
         val userOptional = getUserById(id)
         if (userOptional.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find user with ID: $id")
@@ -134,6 +155,5 @@ class UserDataAccessService : UserDao {
         user.broadcasts.add(serializedBroadcast)
         repository.save(user)
     }
-
 
 }

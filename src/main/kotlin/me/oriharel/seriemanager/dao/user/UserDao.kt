@@ -1,5 +1,6 @@
 package me.oriharel.seriemanager.dao.user
 
+import me.oriharel.seriemanager.api.response.AuthRequest
 import me.oriharel.seriemanager.model.User
 import me.oriharel.seriemanager.model.content.UserSerializedBroadcast
 import java.util.*
@@ -48,4 +49,6 @@ interface UserDao {
     fun markMovieUnwatched(id: UUID, serializedBroadcast: UserSerializedBroadcast): Boolean {
         return markBroadcastUnwatched(id, serializedBroadcast, 1, 1)
     }
+
+    fun generateJwtToken(authRequest: AuthRequest): String
 }
