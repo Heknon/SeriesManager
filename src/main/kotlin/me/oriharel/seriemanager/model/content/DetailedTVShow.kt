@@ -35,7 +35,8 @@ class DetailedTVShow @JsonCreator constructor(
         @JsonProperty("original_language") originalLanguage: String,
         @JsonProperty("vote_count") voteCount: Int,
         @JsonProperty("name") name: String,
-        @JsonProperty("original_name") originalName: String
+        @JsonProperty("original_name") originalName: String,
+        @JsonProperty("watched") watched: Boolean
 ) : TVShow(
         poster,
         popularity,
@@ -50,5 +51,6 @@ class DetailedTVShow @JsonCreator constructor(
         voteCount,
         name,
         originalName,
-        type
+        type,
+        watched
 ), DetailedBroadcast

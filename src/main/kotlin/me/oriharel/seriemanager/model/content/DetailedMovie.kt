@@ -32,7 +32,8 @@ class DetailedMovie @JsonCreator constructor(
         @JsonProperty("production_companies") override val productionCompanies: List<ProductionCompany>,
         @JsonProperty("runtime") val runtime: Int,
         @JsonProperty("spoken_languages") val languages: List<Language>,
-        @JsonProperty("status") override val status: String
+        @JsonProperty("status") override val status: String,
+        @JsonProperty("watched") watched: Boolean
 ) : Movie(
         adult,
         video,
@@ -47,5 +48,6 @@ class DetailedMovie @JsonCreator constructor(
         overview,
         releaseDate,
         voteCount,
-        name
+        name,
+        watched
 ), DetailedBroadcast

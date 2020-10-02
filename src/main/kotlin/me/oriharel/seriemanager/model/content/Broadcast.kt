@@ -12,6 +12,7 @@ abstract class Broadcast(
         @JsonProperty("name") open val name: String,
         @JsonProperty("vote_average") open val voteAverage: Double,
         @JsonProperty("vote_count") open val voteCount: Int,
+        @JsonProperty("watched") open val watched: Boolean,
         open val releaseDate: Instant
 ) {
     val posterUrl = "${Routes.IMAGES_API}$poster"

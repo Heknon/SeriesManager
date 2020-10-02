@@ -12,7 +12,8 @@ class Season @JsonCreator constructor(
         @JsonProperty("poster_path") override val poster: String?,
         @JsonProperty("overview") override val overview: String,
         @JsonProperty("name") override val name: String,
-        @JsonProperty("air_date") override val releaseDate: Instant
+        @JsonProperty("air_date") override val releaseDate: Instant,
+        @JsonProperty("watched") override val watched: Boolean
 ) : Broadcast(
         id,
         poster,
@@ -20,5 +21,6 @@ class Season @JsonCreator constructor(
         name,
         -1.0,
         -1,
+        watched,
         releaseDate
 )

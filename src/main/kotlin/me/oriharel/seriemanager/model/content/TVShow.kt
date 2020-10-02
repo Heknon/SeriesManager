@@ -19,7 +19,8 @@ open class TVShow @JsonCreator constructor(
         @JsonProperty("vote_count") override val voteCount: Int,
         @JsonProperty("name") override val name: String,
         @JsonProperty("original_name") val originalName: String,
-        @JsonProperty("media_type") open val type: String
+        @JsonProperty("media_type") open val type: String,
+        @JsonProperty("watched") override val watched: Boolean
 ) : Broadcast(
         id,
         poster,
@@ -27,6 +28,7 @@ open class TVShow @JsonCreator constructor(
         name,
         voteAverage,
         voteCount,
+        watched,
         releaseDate
 ) {
     val backdropUrl = "${Routes.IMAGES_API}$backdrop"
