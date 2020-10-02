@@ -11,5 +11,5 @@ class Review @JsonCreator constructor(
         @JsonProperty("media_id") val mediaId: Int,
         @JsonProperty("media_title") val mediaTitle: String,
         @JsonProperty("media_type") val mediaType: String,
-        @JsonProperty("url") val url: String
+        @JsonProperty("url") val url: String,
 )

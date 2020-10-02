@@ -48,5 +48,4 @@ interface UserDao {
     fun markMovieUnwatched(id: UUID, serializedBroadcast: UserSerializedBroadcast): Boolean {
         return markBroadcastUnwatched(id, serializedBroadcast, 1, 1)
     }
-
 }

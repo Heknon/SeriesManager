@@ -24,7 +24,7 @@ open class Movie @JsonCreator constructor(
         @JsonProperty("title") override val name: String,
         @JsonProperty("media_type", defaultValue = "movie") val type: String,
         @JsonProperty("watched") override var watched: Boolean,
-        @JsonProperty("broadcast_count") override val broadcastCount: Int = 1
+        @JsonProperty("broadcast_count") override val broadcastCount: Int = 1,
 ) : Broadcast(
         id,
         poster,

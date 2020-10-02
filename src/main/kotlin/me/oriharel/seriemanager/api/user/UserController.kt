@@ -12,7 +12,7 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 @RestController
-@RequestMapping("api/v1/user")
+@RequestMapping("api/v1/user", produces = ["application/json"], consumes = ["application/json"])
 class UserController @Autowired constructor(private val userService: UserService) {
     /**
      * @param id the id of the user to fetch

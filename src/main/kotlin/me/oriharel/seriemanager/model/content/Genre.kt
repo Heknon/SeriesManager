@@ -5,5 +5,5 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Genre @JsonCreator constructor(
         @JsonProperty("id") val id: Int,
-        @JsonProperty("name") val name: String
+        @JsonProperty("name") val name: String,
 )

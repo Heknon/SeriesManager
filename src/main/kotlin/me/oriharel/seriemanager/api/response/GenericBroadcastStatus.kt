@@ -11,5 +11,5 @@ data class GenericBroadcastStatus @JsonCreator constructor(
         @JsonProperty("broadcast_name") var name: String? = null,
         @JsonProperty("remaining_episodes_in_show") var remainingShowEpisodes: Int? = null,
         @JsonProperty("remaining_episodes_in_season") var remainingSeasonEpisodes: Int? = null,
-        @JsonProperty("watched") var broadcastWatched: Boolean? = null
+        @JsonProperty("watched") var broadcastWatched: Boolean? = null,
 )

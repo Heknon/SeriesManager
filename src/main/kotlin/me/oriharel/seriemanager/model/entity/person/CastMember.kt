@@ -11,5 +11,5 @@ data class CastMember @JsonCreator constructor(
         @JsonProperty("id") override val id: Int,
         @JsonProperty("name") override val name: String,
         @JsonProperty("order") val order: Int,
-        @JsonProperty("profile_path") override val profile: String?
+        @JsonProperty("profile_path") override val profile: String?,
 ) : Person(id, creditId, name, gender, profile)

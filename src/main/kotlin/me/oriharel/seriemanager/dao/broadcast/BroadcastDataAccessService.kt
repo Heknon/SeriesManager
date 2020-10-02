@@ -2,6 +2,7 @@ package me.oriharel.seriemanager.dao.broadcast
 
 import me.oriharel.seriemanager.Routes
 import me.oriharel.seriemanager.model.content.*
+import me.oriharel.seriemanager.service.UserService
 import me.oriharel.seriemanager.utility.Mapper
 import me.oriharel.seriemanager.utility.convertURLJsonResponse
 import me.oriharel.seriemanager.utility.getJsonObject
@@ -60,12 +61,12 @@ class BroadcastDataAccessService : BroadcastDao {
         return results
     }
 
-    override fun showEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast): Int {
+    override fun episodesRemainingInShow(serializedBroadcast: UserSerializedBroadcast): Int {
         val bc = getDetailedBroadcast(serializedBroadcast).get()
         return bc.broadcastCount - serializedBroadcast.totalEpisodesWatched
     }
 
-    override fun seasonEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast, season: Short): Int {
+    override fun episodesRemainingInSeason(serializedBroadcast: UserSerializedBroadcast, season: Short): Int {
         val bc = getDetailedBroadcast(serializedBroadcast).get() as DetailedTVShow
         return bc.seasons[season.toInt() - 1].episodeCount - (serializedBroadcast.watched?.get(season)?.count() ?: 0)
     }
@@ -120,6 +121,93 @@ class BroadcastDataAccessService : BroadcastDao {
         }
 
         return result
+    }
+
+    override fun getMaxWatchtime(id: UUID, userService: UserService): Int {
+        val broadcasts = getBroadcastsFromId(id, userService)
+        var watchtime = 0
+        broadcasts.forEach {
+            if (it.isPresent) {
+                val bc = it.get()
+                if (bc is DetailedTVShow) {
+                    watchtime += bc.runtime[0] * bc.numberOfEpisodes
+                } else if (bc is DetailedMovie) {
+                    watchtime += bc.runtime
+                }
+            }
+        }
+
+        return watchtime
+    }
+
+    override fun getMaxShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int {
+        val bc = getDetailedBroadcast(serializedBroadcast).get()
+
+        if (bc is DetailedMovie) {
+            return bc.runtime
+        } else if (bc is DetailedTVShow) {
+            return bc.runtime[0] * bc.numberOfEpisodes
+        }
+        return 0
+    }
+
+    override fun getMaxSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int {
+        val bc = getDetailedBroadcast(serializedBroadcast).get()
+        if (bc is DetailedMovie) {
+            return bc.runtime
+        } else if (bc is DetailedTVShow) {
+            return bc.runtime[0] * bc.seasons[season - 1].episodeCount
+        }
+        return 0
+    }
+
+    override fun getWatchtime(id: UUID, userService: UserService): Int {
+        val idToSerializedBroadcast = safelyGetSerializedBroadcasts(id, userService).associateBy { it.id!! }
+        val broadcasts = getBroadcastsFromId(id, userService)
+        var watchtime = 0
+
+        broadcasts.forEach {
+            val bc = it.get()
+            if (bc is DetailedTVShow) {
+                watchtime += bc.runtime[0] * (bc.numberOfEpisodes - episodesRemainingInShow(idToSerializedBroadcast[bc.id]!!))
+            } else if (bc is DetailedMovie) {
+                watchtime += bc.runtime
+            }
+        }
+
+        return watchtime
+    }
+
+    override fun getShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int {
+        val bc = getDetailedBroadcast(serializedBroadcast).get()
+        if (bc is DetailedMovie) {
+            return bc.runtime
+        } else if (bc is DetailedTVShow) {
+            return bc.runtime[0] * (bc.numberOfEpisodes - episodesRemainingInShow(serializedBroadcast))
+        }
+        return 0
+    }
+
+    override fun getSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int {
+        val bc = getDetailedBroadcast(serializedBroadcast).get()
+        if (bc is DetailedMovie) {
+            return bc.runtime
+        } else if (bc is DetailedTVShow) {
+            return bc.runtime[0] * (bc.seasons[season - 1].episodeCount - episodesRemainingInSeason(serializedBroadcast, season.toShort()))
+        }
+        return 0
+    }
+
+    private fun getBroadcastsFromId(id: UUID, userService: UserService): List<Optional<Broadcast>> {
+        return getDetailedBroadcasts(*safelyGetSerializedBroadcasts(id, userService).toTypedArray())
+    }
+
+    fun safelyGetSerializedBroadcasts(id: UUID, userService: UserService): Set<UserSerializedBroadcast> {
+        val broadcastsOptional = userService.getBroadcasts(id)
+        if (broadcastsOptional.isEmpty) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist")
+        }
+        return broadcastsOptional.get()
     }
 
     companion object {

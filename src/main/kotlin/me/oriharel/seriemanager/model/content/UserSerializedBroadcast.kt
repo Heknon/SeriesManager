@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull
 data class UserSerializedBroadcast @JsonCreator constructor(
         @NotBlank @JsonProperty("type") val type: String,
         @NotNull @Min(1) @JsonProperty("id") val id: Int?,
-        @JsonProperty("watched") val watched: MutableMap<Short, MutableSet<Short>>? = mutableMapOf()
+        @JsonProperty("watched") val watched: MutableMap<Short, MutableSet<Short>>? = mutableMapOf(),
 ) {
     constructor(tmdbId: Int, broadcast: UserSerializedBroadcast) : this(broadcast.type, tmdbId, broadcast.watched)
 

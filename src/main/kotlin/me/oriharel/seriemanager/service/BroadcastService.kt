@@ -26,11 +26,11 @@ class BroadcastService @Autowired constructor(@Qualifier("broadcastDao") private
     }
 
     fun showEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast): Int {
-        return broadcastDao.showEpisodesRemaining(serializedBroadcast)
+        return broadcastDao.episodesRemainingInShow(serializedBroadcast)
     }
 
     fun seasonEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast, season: Short): Int {
-        return broadcastDao.seasonEpisodesRemaining(serializedBroadcast, season)
+        return broadcastDao.episodesRemainingInSeason(serializedBroadcast, season)
     }
 
     fun seasonEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast, vararg season: Short): Map<Short, Int> {
@@ -55,5 +55,29 @@ class BroadcastService @Autowired constructor(@Qualifier("broadcastDao") private
 
     fun getDetailedEpisode(serializedBroadcast: UserSerializedBroadcast, season: Int, episode: Int): Episode {
         return broadcastDao.getDetailedEpisode(serializedBroadcast, season, episode)
+    }
+
+    fun getMaxWatchtime(id: UUID, userService: UserService): Int {
+        return broadcastDao.getMaxWatchtime(id, userService)
+    }
+
+    fun getMaxShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int {
+        return broadcastDao.getMaxShowWatchtime(id, serializedBroadcast)
+    }
+
+    fun getMaxSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int {
+        return broadcastDao.getMaxSeasonWatchtime(id, serializedBroadcast, season)
+    }
+
+    fun getWatchtime(id: UUID, userService: UserService): Int {
+        return broadcastDao.getWatchtime(id, userService)
+    }
+
+    fun getShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int {
+        return broadcastDao.getShowWatchtime(id, serializedBroadcast)
+    }
+
+    fun getSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int {
+        return broadcastDao.getSeasonWatchtime(id, serializedBroadcast, season)
     }
 }

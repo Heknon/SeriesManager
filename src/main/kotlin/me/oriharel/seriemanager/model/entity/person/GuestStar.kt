@@ -11,5 +11,5 @@ data class GuestStar @JsonCreator constructor(
         @JsonProperty("character") val character: String,
         @JsonProperty("order") val order: Int,
         @JsonProperty("gender") override val gender: Int,
-        @JsonProperty("profile_path") override val profile: String?
+        @JsonProperty("profile_path") override val profile: String?,
 ) : Person(id, creditId, name, gender, profile)

@@ -12,7 +12,7 @@ class User(
         @Id @JsonProperty val id: UUID?,
         @NotNull @JsonProperty val email: String,
         @NotNull @JsonProperty val name: String,
-        @JsonProperty val broadcasts: MutableSet<UserSerializedBroadcast> = mutableSetOf()
+        @JsonProperty val broadcasts: MutableSet<UserSerializedBroadcast> = mutableSetOf(),
 ) {
     constructor(user: User) : this(user.id, user.email, user.name, user.broadcasts)
     constructor(id: UUID, user: User) : this(id, user.email, user.name, user.broadcasts)

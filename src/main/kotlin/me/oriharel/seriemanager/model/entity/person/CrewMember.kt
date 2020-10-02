@@ -11,5 +11,5 @@ data class CrewMember @JsonCreator constructor(
         @JsonProperty("department") val department: String,
         @JsonProperty("job") val job: String,
         @JsonProperty("gender") override val gender: Int,
-        @JsonProperty("profile_path") override val profile: String?
+        @JsonProperty("profile_path") override val profile: String?,
 ) : Person(id, creditId, name, gender, profile)

@@ -22,7 +22,7 @@ class Episode @JsonCreator constructor(
         @JsonProperty("still_path") override val poster: String?,
         @JsonProperty("vote_average") override val voteAverage: Double,
         @JsonProperty("vote_count") override val voteCount: Int,
-        @JsonProperty("watched") override var watched: Boolean
+        @JsonProperty("watched") override var watched: Boolean,
 ) : Broadcast(
         id,
         poster,

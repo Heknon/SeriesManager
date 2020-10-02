@@ -7,13 +7,13 @@ import javax.validation.constraints.Min
 data class WatchStatus @JsonCreator constructor(
         @JsonProperty("watched") val watched: Boolean,
         @Min(0) @JsonProperty("season") val season: Short,
-        @Min(0) @JsonProperty("episode") val episode: Short
+        @Min(0) @JsonProperty("episode") val episode: Short,
 )
 
 data class WatchStatusBulk @JsonCreator constructor(
         @JsonProperty("watched") val watched: Boolean,
         @Min(0) @JsonProperty("season") val season: Short,
-        @Min(0) @JsonProperty("episodes") val episodes: ShortArray
+        @Min(0) @JsonProperty("episodes") val episodes: ShortArray,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

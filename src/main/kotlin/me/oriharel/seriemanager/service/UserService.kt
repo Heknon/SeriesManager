@@ -5,7 +5,9 @@ import me.oriharel.seriemanager.model.User
 import me.oriharel.seriemanager.model.content.UserSerializedBroadcast
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Service
@@ -62,5 +64,16 @@ class UserService @Autowired constructor(@Qualifier("userDao") private val userD
             return userDao.markMovieUnwatched(id, serializedBroadcast)
         }
         return userDao.markBroadcastUnwatched(id, serializedBroadcast, season, *episode)
+    }
+
+    fun getSerializedBroadcast(
+            userId: UUID,
+            broadcastId: Int,
+    ): UserSerializedBroadcast {
+        val optional = userDao.getBroadcastById(userId, broadcastId)
+        if (optional.isEmpty) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "User does not have this broadcast!")
+        }
+        return optional.get()
     }
 }

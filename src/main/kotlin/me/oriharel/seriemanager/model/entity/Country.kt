@@ -8,5 +8,5 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 class Country @JsonCreator constructor(
         @JsonProperty("iso_3166_1") val id: String,
-        @JsonProperty("name") val name: String
+        @JsonProperty("name") val name: String,
 )
