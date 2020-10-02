@@ -6,8 +6,9 @@ import org.springframework.core.convert.converter.Converter
 import org.springframework.format.FormatterRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
+
 @Configuration
-class EnumConverter : WebMvcConfigurer {
+class Config : WebMvcConfigurer {
     override fun addFormatters(registry: FormatterRegistry) {
         registry.addConverter(object : Converter<String, SearchType> {
             override fun convert(str: String): SearchType? {

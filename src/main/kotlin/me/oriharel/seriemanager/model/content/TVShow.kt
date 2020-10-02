@@ -14,7 +14,7 @@ open class TVShow @JsonCreator constructor(
         @JsonProperty("backdrop_path") val backdrop: String?,
         @JsonProperty("vote_average") override val voteAverage: Double,
         @JsonProperty("overview") override val overview: String,
-        @JsonProperty("first_air_date") override val releaseDate: Instant,
+        @JsonProperty("first_air_date") override val releaseDate: Instant?,
         @JsonProperty("origin_country") val originCountry: List<String>,
         @JsonProperty("genre_ids") val genreIds: List<Int>,
         @JsonProperty("original_language") val originalLanguage: String,
@@ -36,4 +36,9 @@ open class TVShow @JsonCreator constructor(
         releaseDate
 ) {
     val backdropUrl = "${Routes.IMAGES_API}$backdrop"
+    override fun toString(): String {
+        return "TVShow(poster=$poster, popularity=$popularity, id=$id, backdrop=$backdrop, voteAverage=$voteAverage, overview='$overview', releaseDate=$releaseDate, originCountry=$originCountry, genreIds=$genreIds, originalLanguage='$originalLanguage', voteCount=$voteCount, name='$name', originalName='$originalName', type='$type', watched=$watched, broadcastCount=$broadcastCount, backdropUrl='$backdropUrl')"
+    }
+
+
 }

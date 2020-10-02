@@ -18,7 +18,7 @@ class DetailedMovie @JsonCreator constructor(
         @JsonProperty("tagline") val tagline: String?,
         @JsonProperty("adult") adult: Boolean,
         @JsonProperty("video") video: Boolean,
-        @JsonProperty("backdrop_path") backdrop: String,
+        @JsonProperty("backdrop_path") backdrop: String?,
         @JsonProperty("popularity") popularity: Double,
         @JsonProperty("original_title") originalName: String,
         @JsonProperty("genres") genres: List<Genre>,
@@ -54,4 +54,8 @@ class DetailedMovie @JsonCreator constructor(
         "movie",
         watched,
         1
-), DetailedBroadcast
+), DetailedBroadcast {
+    override fun toString(): String {
+        return "DetailedMovie(belongsToCollection=$belongsToCollection, budget=$budget, imdbId=$imdbId, productionCountries=$productionCountries, revenue=$revenue, tagline=$tagline, homepage='$homepage', productionCompanies=$productionCompanies, runtime=$runtime, languages=$languages, status='$status')"
+    }
+}

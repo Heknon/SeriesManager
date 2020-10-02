@@ -9,7 +9,7 @@ open class Person @JsonCreator constructor(
         @JsonProperty("credit_id") open val creditId: String,
         @JsonProperty("name") override val name: String,
         @JsonProperty("gender") open val gender: Int,
-        @JsonProperty("profile_path") open val profile: String
+        @JsonProperty("profile_path") open val profile: String?
 ) : Entity {
     val profileUrl get() = "${Routes.IMAGES_API}$profile"
 }

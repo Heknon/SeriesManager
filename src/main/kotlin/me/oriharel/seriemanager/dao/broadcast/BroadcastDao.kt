@@ -2,6 +2,7 @@ package me.oriharel.seriemanager.dao.broadcast
 
 import me.oriharel.seriemanager.model.content.Broadcast
 import me.oriharel.seriemanager.model.content.Episode
+import me.oriharel.seriemanager.model.content.Season
 import me.oriharel.seriemanager.model.content.UserSerializedBroadcast
 import java.util.*
 
@@ -9,6 +10,10 @@ interface BroadcastDao {
     fun getDetailedBroadcasts(vararg serializedBroadcast: UserSerializedBroadcast): List<Optional<Broadcast>>
 
     fun getDetailedBroadcast(serializedBroadcast: UserSerializedBroadcast): Optional<Broadcast>
+
+    fun getDetailedSeason(serializedBroadcast: UserSerializedBroadcast, season: Int): Season
+
+    fun getDetailedEpisode(serializedBroadcast: UserSerializedBroadcast, season: Int, episode: Int): Episode
 
     fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast?>
 
@@ -22,5 +27,5 @@ interface BroadcastDao {
 
     fun movieIsWatched(vararg serializedBroadcast: UserSerializedBroadcast): Boolean
 
-    fun getBroadcastsWatchStatus(vararg serializedBroadcast: UserSerializedBroadcast): Map<Broadcast, Map<Broadcast, Boolean>>
+    fun getBroadcastsWatchStatus(vararg serializedBroadcast: UserSerializedBroadcast): Map<String, MutableMap<Int, MutableList<Map<String, Boolean>>>>
 }

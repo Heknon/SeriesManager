@@ -25,15 +25,16 @@ class BroadcastDataAccessService : BroadcastDao {
             else -> return Optional.empty()
         }
 
-        var episodesWatched = 0
-        serializedBroadcast.watched?.forEach {
-            it.value.forEach { s ->
-                episodesWatched += s
-            }
-        }
-
-        broadcast.watched = broadcast.broadcastCount <= episodesWatched
+        broadcast.watched = broadcast.broadcastCount <= serializedBroadcast.totalEpisodesWatched
         return Optional.of(broadcast)
+    }
+
+    override fun getDetailedSeason(serializedBroadcast: UserSerializedBroadcast, season: Int): Season {
+        return getTVSeasonEndpoint(serializedBroadcast.id!!, season).convertURLJsonResponse()
+    }
+
+    override fun getDetailedEpisode(serializedBroadcast: UserSerializedBroadcast, season: Int, episode: Int): Episode {
+        return getTVEpisodeEndpoint(serializedBroadcast.id!!, season, episode).convertURLJsonResponse()
     }
 
     override fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast?> {
@@ -66,7 +67,7 @@ class BroadcastDataAccessService : BroadcastDao {
 
     override fun seasonEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast, season: Short): Int {
         val bc = getDetailedBroadcast(serializedBroadcast).get() as DetailedTVShow
-        return bc.seasons[season.toInt()].episodeCount - (serializedBroadcast.watched?.get(season)?.count() ?: 0)
+        return bc.seasons[season.toInt() - 1].episodeCount - (serializedBroadcast.watched?.get(season)?.count() ?: 0)
     }
 
     override fun seasonEpisodesRemaining(serializedBroadcast: UserSerializedBroadcast, vararg season: Short): Map<Short, Int> {
@@ -74,7 +75,7 @@ class BroadcastDataAccessService : BroadcastDao {
         val map = mutableMapOf<Short, Int>()
 
         season.forEach {
-            map[it] = bc.seasons[it.toInt()].episodeCount - (serializedBroadcast.watched?.get(it)?.count() ?: 0)
+            map[it] = bc.seasons[it.toInt() - 1].episodeCount - (serializedBroadcast.watched?.get(it)?.count() ?: 0)
         }
 
         return map
@@ -92,23 +93,27 @@ class BroadcastDataAccessService : BroadcastDao {
         return true
     }
 
-    override fun getBroadcastsWatchStatus(vararg serializedBroadcast: UserSerializedBroadcast): Map<Broadcast, Map<Broadcast, Boolean>> {
+    override fun getBroadcastsWatchStatus(vararg serializedBroadcast: UserSerializedBroadcast): Map<String, MutableMap<Int, MutableList<Map<String, Boolean>>>> {
         val broadcasts = getDetailedBroadcasts(*serializedBroadcast)
         val idSerializedMap = serializedBroadcast.associateBy { it.id }
-        val result = mutableMapOf<Broadcast, Map<Broadcast, Boolean>>()
+        val result = mutableMapOf<String, MutableMap<Int, MutableList<Map<String, Boolean>>>>()
 
         broadcasts.forEach { broadcast ->
             val bc = broadcast.get()
             if (bc is DetailedMovie) {
-                result[bc] = mutableMapOf(Pair(bc as Broadcast, bc.watched))
+                result[bc.name] = mutableMapOf(Pair(1, mutableListOf(mapOf(Pair(bc.name, bc.watched)))))
             } else if (bc is DetailedTVShow) {
-                bc.seasons.forEach { season ->
+                bc.seasons.forEach { seasonSmall ->
+                    val season = getDetailedSeason(idSerializedMap[bc.id]!!, seasonSmall.seasonNumber)
                     season.episodes?.forEach {
-                        result[bc] = mutableMapOf(Pair(it as Broadcast, episodeIsWatched(
+                        val info = mapOf(Pair(it.name, episodeIsWatched(
                                 idSerializedMap[bc.id]!!,
                                 season.seasonNumber.toShort(),
                                 it.episodeNumber.toShort()
                         )))
+                        result[bc.name]?.get(season.seasonNumber)?.add(info)
+                                ?: result[bc.name]?.set(season.seasonNumber, mutableListOf(info))
+                                ?: result.set(bc.name, mutableMapOf(Pair(season.seasonNumber, mutableListOf(info))))
                     }
                 }
             }
@@ -119,7 +124,15 @@ class BroadcastDataAccessService : BroadcastDao {
 
     companion object {
         private fun getTVShowEndpoint(id: Int): String {
-            return "${Routes.BASE_URL}/tv/${id}?api_key=${Routes.API_KEY}&language=en-US"
+            return "${Routes.BASE_URL}/tv/${id}?${Routes.ENDPOINT_END}"
+        }
+
+        private fun getTVSeasonEndpoint(id: Int, season: Int): String {
+            return "${Routes.BASE_URL}/tv/${id}/season/${season}?${Routes.ENDPOINT_END}"
+        }
+
+        private fun getTVEpisodeEndpoint(id: Int, season: Int, episode: Int): String {
+            return "${Routes.BASE_URL}/tv/${id}/season/${season}/episode/${episode}?${Routes.ENDPOINT_END}"
         }
 
         private fun getMovieEndpoint(id: Int): String {

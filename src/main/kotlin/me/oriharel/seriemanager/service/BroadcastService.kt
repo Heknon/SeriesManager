@@ -3,6 +3,8 @@ package me.oriharel.seriemanager.service
 import me.oriharel.seriemanager.dao.broadcast.BroadcastDao
 import me.oriharel.seriemanager.dao.broadcast.SearchType
 import me.oriharel.seriemanager.model.content.Broadcast
+import me.oriharel.seriemanager.model.content.Episode
+import me.oriharel.seriemanager.model.content.Season
 import me.oriharel.seriemanager.model.content.UserSerializedBroadcast
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -43,7 +45,15 @@ class BroadcastService @Autowired constructor(@Qualifier("broadcastDao") private
         return broadcastDao.movieIsWatched(*serializedBroadcast)
     }
 
-    fun getBroadcastsWatchStatus(vararg serializedBroadcast: UserSerializedBroadcast): Map<Broadcast, Map<Broadcast, Boolean>> {
+    fun getBroadcastsWatchStatus(vararg serializedBroadcast: UserSerializedBroadcast): Map<String, MutableMap<Int, MutableList<Map<String, Boolean>>>> {
         return broadcastDao.getBroadcastsWatchStatus(*serializedBroadcast)
+    }
+
+    fun getDetailedSeason(serializedBroadcast: UserSerializedBroadcast, season: Int): Season {
+        return broadcastDao.getDetailedSeason(serializedBroadcast, season)
+    }
+
+    fun getDetailedEpisode(serializedBroadcast: UserSerializedBroadcast, season: Int, episode: Int): Episode {
+        return broadcastDao.getDetailedEpisode(serializedBroadcast, season, episode)
     }
 }

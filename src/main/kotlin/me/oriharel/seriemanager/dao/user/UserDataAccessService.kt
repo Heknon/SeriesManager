@@ -2,7 +2,6 @@ package me.oriharel.seriemanager.dao.user
 
 import me.oriharel.seriemanager.model.User
 import me.oriharel.seriemanager.model.content.UserSerializedBroadcast
-import me.oriharel.seriemanager.service.BroadcastService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
@@ -93,7 +92,7 @@ class UserDataAccessService : UserDao {
 
     override fun markBroadcastWatched(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Short, vararg episode: Short): Boolean {
         // check if the movie has already been watched as to not go through the process of marking twice
-        if (serializedBroadcast.type.equals("movie", ignoreCase = true)
+        if (serializedBroadcast.isMovie
                 && ((serializedBroadcast.watched?.count() ?: 0) > 1
                         || serializedBroadcast.watched?.get(1)?.contains(1) == true)) return false
 
@@ -111,7 +110,7 @@ class UserDataAccessService : UserDao {
 
     override fun markBroadcastUnwatched(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Short, vararg episode: Short): Boolean {
         // check if the movie is already unwatched stop to not go through the process of marking twice
-        if (serializedBroadcast.type.equals("movie", ignoreCase = true) && serializedBroadcast.watched?.get(1)?.contains(1) == false) return false
+        if (serializedBroadcast.isMovie && serializedBroadcast.watched?.get(1)?.contains(1) == false) return false
 
         // if the season key doesn't exist there are no episodes to remove
         if (serializedBroadcast.watched?.containsKey(season) == false) return false

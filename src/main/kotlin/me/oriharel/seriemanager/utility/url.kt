@@ -22,7 +22,7 @@ object Mapper {
         module.addDeserializer(Instant::class.java, object : StdDeserializer<Instant>(Instant::class.java) {
             override fun deserialize(jp: JsonParser, ctx: DeserializationContext): Instant? {
                 val node: JsonNode = jp.codec.readTree(jp)
-                if (node.asText().isBlank()) return Instant.parse("2020-01-01T00:00:00Z")
+                if (node.asText().isBlank()) return Instant.parse("1010-01-01T00:00:00Z")
                 return Instant.parse("${node.asText()}T00:00:00Z")
             }
         })
@@ -41,11 +41,11 @@ object Mapper {
 }
 
 inline fun <reified T> String.convertURLJsonResponse(): T {
+    println(this)
     return Mapper.mapper.readValue(URL(this), T::class.java)
 }
 
 fun String.getJsonObject(): JSONObject {
-    println(this.replace(" ", "%20"))
     val text = URL(this.replace(" ", "%20")).readText()
     return JSONObject(text)
 }

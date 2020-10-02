@@ -22,8 +22,7 @@ class Episode @JsonCreator constructor(
         @JsonProperty("still_path") override val poster: String?,
         @JsonProperty("vote_average") override val voteAverage: Double,
         @JsonProperty("vote_count") override val voteCount: Int,
-        @JsonProperty("watched") override var watched: Boolean,
-        @JsonProperty("broadcast_count") override val broadcastCount: Int = 1
+        @JsonProperty("watched") override var watched: Boolean
 ) : Broadcast(
         id,
         poster,
@@ -32,6 +31,10 @@ class Episode @JsonCreator constructor(
         voteAverage,
         voteCount,
         watched,
-        broadcastCount,
+        1,
         releaseDate
-)
+) {
+    override fun toString(): String {
+        return "Episode(releaseDate=$releaseDate, crew=$crew, episodeNumber=$episodeNumber, guestStars=$guestStars, name='$name', overview='$overview', id=$id, showId=$showId, productionCode='$productionCode', seasonNumber=$seasonNumber, poster=$poster, voteAverage=$voteAverage, voteCount=$voteCount, watched=$watched, broadcastCount=$broadcastCount)"
+    }
+}

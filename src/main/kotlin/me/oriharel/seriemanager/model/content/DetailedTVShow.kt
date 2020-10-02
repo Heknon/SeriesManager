@@ -15,8 +15,8 @@ class DetailedTVShow @JsonCreator constructor(
         @JsonProperty("homepage") override val homepage: String,
         @JsonProperty("in_production") val inProduction: Boolean,
         @JsonProperty("languages") val languages: List<String>,
-        @JsonProperty("last_air_date") val lastAirDate: Instant,
-        @JsonProperty("last_episode_to_air") val lastEpisodeToAir: Episode,
+        @JsonProperty("last_air_date") val lastAirDate: Instant?,
+        @JsonProperty("last_episode_to_air") val lastEpisodeToAir: Episode?,
         @JsonProperty("next_episode_to_air") val nextEpisodeToAir: Episode?,
         @JsonProperty("networks") val networks: List<Network>,
         @JsonProperty("number_of_episodes") val numberOfEpisodes: Int,
@@ -28,18 +28,17 @@ class DetailedTVShow @JsonCreator constructor(
         @JsonProperty("poster_path") poster: String?,
         @JsonProperty("popularity") popularity: Double,
         @JsonProperty("id") id: Int,
-        @JsonProperty("backdrop_path") backdrop: String,
+        @JsonProperty("backdrop_path") backdrop: String?,
         @JsonProperty("vote_average") voteAverage: Double,
         @JsonProperty("overview") overview: String,
-        @JsonProperty("first_air_date") releaseDate: Instant,
+        @JsonProperty("first_air_date") releaseDate: Instant?,
         @JsonProperty("origin_country") originCountry: List<String>,
         @JsonProperty("genres") genres: List<Genre>,
         @JsonProperty("original_language") originalLanguage: String,
         @JsonProperty("vote_count") voteCount: Int,
         @JsonProperty("name") name: String,
         @JsonProperty("original_name") originalName: String,
-        @JsonProperty("watched") watched: Boolean,
-        @JsonProperty("broadcast_count") override val broadcastCount: Int = numberOfEpisodes
+        @JsonProperty("watched") watched: Boolean
 ) : TVShow(
         poster,
         popularity,
@@ -56,5 +55,10 @@ class DetailedTVShow @JsonCreator constructor(
         originalName,
         type,
         watched,
-        broadcastCount
-), DetailedBroadcast
+        numberOfEpisodes
+
+), DetailedBroadcast {
+    override fun toString(): String {
+        return "DetailedTVShow(createdBy=$createdBy, runtime=$runtime, homepage='$homepage', inProduction=$inProduction, languages=$languages, lastAirDate=$lastAirDate, lastEpisodeToAir=$lastEpisodeToAir, nextEpisodeToAir=$nextEpisodeToAir, networks=$networks, numberOfEpisodes=$numberOfEpisodes, numberOfSeasons=$numberOfSeasons, productionCompanies=$productionCompanies, seasons=$seasons, status='$status', type='$type', broadcastCount=$broadcastCount)"
+    }
+}

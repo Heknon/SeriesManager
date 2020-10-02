@@ -37,4 +37,9 @@ open class Movie @JsonCreator constructor(
         releaseDate
 ) {
     val backdropUrl = "${Routes.IMAGES_API}$backdrop"
+    override fun toString(): String {
+        return "Movie(adult=$adult, video=$video, backdrop=$backdrop, popularity=$popularity, originalName=$originalName, genreIds=$genreIds, originalLanguage='$originalLanguage', poster=$poster, id=$id, voteAverage=$voteAverage, overview='$overview', releaseDate=$releaseDate, voteCount=$voteCount, name='$name', type='$type', watched=$watched, broadcastCount=$broadcastCount, backdropUrl='$backdropUrl')"
+    }
+
+
 }

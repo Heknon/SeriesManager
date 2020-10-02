@@ -51,10 +51,16 @@ class UserService @Autowired constructor(@Qualifier("userDao") private val userD
     }
 
     fun markBroadcastWatched(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Short, vararg episode: Short): Boolean {
+        if (serializedBroadcast.isMovie) {
+            return userDao.markMovieWatched(id, serializedBroadcast)
+        }
         return userDao.markBroadcastWatched(id, serializedBroadcast, season, *episode)
     }
 
     fun markBroadcastUnwatched(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Short, vararg episode: Short): Boolean {
+        if (serializedBroadcast.isMovie) {
+            return userDao.markMovieUnwatched(id, serializedBroadcast)
+        }
         return userDao.markBroadcastUnwatched(id, serializedBroadcast, season, *episode)
     }
 }
