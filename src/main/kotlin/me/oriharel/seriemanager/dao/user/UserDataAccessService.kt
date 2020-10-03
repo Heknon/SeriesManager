@@ -3,11 +3,13 @@ package me.oriharel.seriemanager.dao.user
 import me.oriharel.seriemanager.api.response.AuthRequest
 import me.oriharel.seriemanager.model.User
 import me.oriharel.seriemanager.model.content.UserSerializedBroadcast
+import me.oriharel.seriemanager.security.CurrentUser
 import me.oriharel.seriemanager.security.JwtUtility
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Repository
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
@@ -24,28 +26,45 @@ class UserDataAccessService : UserDao {
     @Autowired
     lateinit var authManager: AuthenticationManager
 
+    @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
+
     override fun addUser(user: User): User {
-        return repository.insert(User(UUID.randomUUID(), user))
+        val newUser = User(UUID.randomUUID(), user.username, passwordEncoder.encode(user.password), user.email, user.name, user.isAdmin, user.broadcasts)
+        return repository.insert(newUser)
     }
 
     override fun getAllUsers(): List<User> {
-        return repository.findAll()
+        val users = repository.findAll()
+        return if (CurrentUser.currentUserIsAdmin) users else listOf(CurrentUser.currentUser.dbUser)
     }
 
     override fun getUserById(id: UUID): Optional<User> {
-        return repository.findById(id)
+        if (CurrentUser.currentUserIsAdmin || (CurrentUser.currentUserId ?: 0) == id) {
+            return repository.findById(id)
+        } else {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must use your own user ID!")
+        }
     }
 
     override fun deleteUserById(id: UUID): Optional<User> {
-        val user = repository.findById(id)
-        repository.deleteById(id)
-        return user
+        if (CurrentUser.currentUserIsAdmin || (CurrentUser.currentUserId ?: 0) == id) {
+            val user = repository.findById(id)
+            repository.deleteById(id)
+            return user
+        } else {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must use your own user ID!")
+        }
     }
 
     override fun updateUserById(id: UUID, user: User): User {
-        val new = User(id, user)
-        repository.save(new)
-        return new
+        if (CurrentUser.currentUserIsAdmin || (CurrentUser.currentUserId ?: 0) == id) {
+            val new = User(id, user)
+            repository.save(new)
+            return new
+        } else {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must use your own user ID!")
+        }
     }
 
     override fun getBroadcasts(id: UUID): Optional<Set<UserSerializedBroadcast>> {
@@ -139,6 +158,7 @@ class UserDataAccessService : UserDao {
 
     override fun generateJwtToken(authRequest: AuthRequest): String {
         try {
+            println()
             authManager.authenticate(UsernamePasswordAuthenticationToken(authRequest.username, authRequest.password))
         } catch (ex: Exception) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password")

@@ -4,13 +4,23 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.security.Key
 import java.util.*
+import javax.crypto.KeyGenerator
+import javax.crypto.spec.SecretKeySpec
 
 @Service
-class JwtUtility(private val secretKey: Key = Keys.secretKeyFor(SignatureAlgorithm.HS256)) {
+class JwtUtility(@Value("\${spring.auth.jwt.key.private}") private val secretString: String) {
+
+    private final val secretKey: Key
+    init {
+        val decoded = Base64.getDecoder().decode(secretString)
+        secretKey = SecretKeySpec(decoded, 0, decoded.size, "HmacSHA256")
+    }
+
     fun extractUsername(token: String): String? {
         return extractClaim(token, Claims::getSubject)
     }

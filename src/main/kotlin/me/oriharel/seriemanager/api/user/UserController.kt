@@ -15,13 +15,13 @@ import javax.validation.constraints.NotNull
 @RequestMapping("api/v1/user", produces = ["application/json"], consumes = ["application/json"])
 class UserController @Autowired constructor(private val userService: UserService) {
     /**
-     * @param id the id of the user to fetch
+     * @param userId the id of the user to fetch
      * Fetches the data of a certain user.
      */
     @Operation(summary = "Get a user's data from it's ID")
-    @GetMapping(path = ["/{id}"])
-    fun getUser(@PathVariable id: UUID): User {
-        val optional = userService.getUserById(id)
+    @GetMapping(path = ["/{userId}"])
+    fun getUser(@PathVariable userId: UUID): User {
+        val optional = userService.getUserById(userId)
         if (optional.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!")
         return optional.get()
     }
@@ -36,35 +36,28 @@ class UserController @Autowired constructor(private val userService: UserService
     }
 
     /**
-     * @param user the user to add to the database
-     * Adds a user to the database
-     */
-    @Operation(summary = "Register a new user")
-    @PostMapping
-    fun addUser(@Valid @NotNull @RequestBody user: User): User {
-        return userService.addUser(user)
-    }
-
-    /**
-     * @param id the id of the user to delete
+     * @param userId the id of the user to delete
      * Deletes the user. If the user is not found a NOT FOUND http status code is raised.
      */
     @Operation(summary = "Remove a user from database - delete user")
-    @DeleteMapping(path = ["/{id}"])
-    fun deleteUserById(@PathVariable id: UUID): User {
-        return userService.deleteUserById(id)
+    @DeleteMapping(path = ["/{userId}"])
+    fun deleteUserById(@PathVariable userId: UUID): User {
+        return userService.deleteUserById(userId)
                 .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find with the ID given. Resource not deleted.") }
     }
 
     /**
-     * @param id the id of the user to update
+     * @param userId the id of the user to update
      * @param user the user object with the new information.
      * The user parameter passed is cloned and given the id passed, afterwards, the new user created (the clone) is saved to the database.
      * Since this is the functionality, you can also create a user using this method.
      */
     @Operation(summary = "Update a user's data")
-    @PutMapping(path = ["/{id}"])
-    fun updateUserById(@PathVariable id: UUID, @Valid @NotNull @RequestBody user: User): User {
-        return userService.updateUserById(id, user)
+    @PutMapping(path = ["/{userId}"])
+    fun updateUserById(
+            @PathVariable userId: UUID,
+            @Valid @NotNull @RequestBody user: User,
+    ): User {
+        return userService.updateUserById(userId, user)
     }
 }

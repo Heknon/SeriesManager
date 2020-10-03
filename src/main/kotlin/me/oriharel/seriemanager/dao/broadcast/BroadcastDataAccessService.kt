@@ -1,6 +1,6 @@
 package me.oriharel.seriemanager.dao.broadcast
 
-import me.oriharel.seriemanager.Routes
+import me.oriharel.seriemanager.utility.Routes
 import me.oriharel.seriemanager.model.content.*
 import me.oriharel.seriemanager.service.UserService
 import me.oriharel.seriemanager.utility.Mapper
@@ -18,16 +18,20 @@ class BroadcastDataAccessService : BroadcastDao {
     }
 
     override fun getDetailedBroadcast(serializedBroadcast: UserSerializedBroadcast): Optional<Broadcast> {
-        val broadcast: Broadcast = when (serializedBroadcast.type) {
-            "movie" -> getMovieEndpoint(serializedBroadcast.id
-                    ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedMovie>()
-            "tv" -> getTVShowEndpoint(serializedBroadcast.id
-                    ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedTVShow>()
-            else -> return Optional.empty()
-        }
+        try {
+            val broadcast: Broadcast = when (serializedBroadcast.type) {
+                "movie" -> getMovieEndpoint(serializedBroadcast.id
+                        ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedMovie>()
+                "tv" -> getTVShowEndpoint(serializedBroadcast.id
+                        ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedTVShow>()
+                else -> return Optional.empty()
+            }
 
-        broadcast.watched = broadcast.broadcastCount <= serializedBroadcast.totalEpisodesWatched
-        return Optional.of(broadcast)
+            broadcast.watched = broadcast.broadcastCount <= serializedBroadcast.totalEpisodesWatched
+            return Optional.of(broadcast)
+        } catch (e: Exception) {
+            return Optional.empty()
+        }
     }
 
     override fun getDetailedSeason(serializedBroadcast: UserSerializedBroadcast, season: Int): Season {

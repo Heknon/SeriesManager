@@ -7,12 +7,16 @@ import me.oriharel.seriemanager.model.content.UserSerializedBroadcast
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Service
 class UserService @Autowired constructor(@Qualifier("userDao") private val userDao: UserDao) {
+
     fun addUser(user: User): User {
         return userDao.addUser(user)
     }

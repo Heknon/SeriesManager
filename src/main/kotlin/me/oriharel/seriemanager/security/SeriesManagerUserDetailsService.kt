@@ -1,8 +1,9 @@
-package me.oriharel.seriemanager.service
+package me.oriharel.seriemanager.security
 
 import me.oriharel.seriemanager.dao.user.UserRepository
 import me.oriharel.seriemanager.model.User
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
@@ -15,7 +16,7 @@ class SeriesManagerUserDetailsService : UserDetailsService {
 
     override fun loadUserByUsername(email: String): UserDetails {
         val user: User = repository.findByUsername(email)
-        return org.springframework.security.core.userdetails.User(user.username, user.password, mutableListOf())
+        return CurrentUser(user)
     }
 
 }

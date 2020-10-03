@@ -2,7 +2,7 @@ package me.oriharel.seriemanager.model.content
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.datetime.Instant
-import me.oriharel.seriemanager.Routes
+import me.oriharel.seriemanager.utility.Routes
 import org.springframework.data.annotation.Id
 
 /**

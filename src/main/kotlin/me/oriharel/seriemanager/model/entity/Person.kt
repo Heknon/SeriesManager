@@ -2,7 +2,7 @@ package me.oriharel.seriemanager.model.entity
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import me.oriharel.seriemanager.Routes
+import me.oriharel.seriemanager.utility.Routes
 
 open class Person @JsonCreator constructor(
         @JsonProperty("id") override val id: Int,

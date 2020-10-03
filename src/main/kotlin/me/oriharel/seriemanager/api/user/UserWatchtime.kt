@@ -24,22 +24,22 @@ class UserWatchtime @Autowired constructor(
     }
 
     @Operation(summary = "Get the maximum total watchtime attainable for a show")
-    @GetMapping(path = ["/max/{showId}"])
+    @GetMapping(path = ["/max/{broadcastId}"])
     fun getMaxShowWatchtime(
             @PathVariable("userId") userId: UUID,
-            @PathVariable("showId") showId: Int,
+            @PathVariable("broadcastId") broadcastId: Int,
     ): WatchtimeFormat {
-        return WatchtimeFormat.build(broadcastService.getMaxShowWatchtime(userId, userService.getSerializedBroadcast(userId, showId)))
+        return WatchtimeFormat.build(broadcastService.getMaxShowWatchtime(userId, userService.getSerializedBroadcast(userId, broadcastId)))
     }
 
     @Operation(summary = "Get the maximum total watchtime attainable for a season in a show")
-    @GetMapping(path = ["/max/{showId}/season/{seasonNumber}"])
+    @GetMapping(path = ["/max/{broadcastId}/season/{seasonNumber}"])
     fun getMaxSeasonWatchtime(
             @PathVariable("userId") userId: UUID,
-            @PathVariable("showId") showId: Int,
+            @PathVariable("broadcastId") broadcastId: Int,
             @PathVariable("seasonNumber") seasonNumber: Int,
     ): WatchtimeFormat {
-        return WatchtimeFormat.build(broadcastService.getMaxSeasonWatchtime(userId, userService.getSerializedBroadcast(userId, showId), seasonNumber))
+        return WatchtimeFormat.build(broadcastService.getMaxSeasonWatchtime(userId, userService.getSerializedBroadcast(userId, broadcastId), seasonNumber))
     }
 
     @Operation(summary = "Get the user's total watchtime")
@@ -49,22 +49,22 @@ class UserWatchtime @Autowired constructor(
     }
 
     @Operation(summary = "Get the user's total watchtime for a show")
-    @GetMapping(path = ["/{showId}"])
+    @GetMapping(path = ["/{broadcastId}"])
     fun getShowWatchtime(
             @PathVariable("userId") userId: UUID,
-            @PathVariable("showId") showId: Int,
+            @PathVariable("broadcastId") broadcastId: Int,
     ): WatchtimeFormat {
-        return WatchtimeFormat.build(broadcastService.getShowWatchtime(userId, userService.getSerializedBroadcast(userId, showId)))
+        return WatchtimeFormat.build(broadcastService.getShowWatchtime(userId, userService.getSerializedBroadcast(userId, broadcastId)))
     }
 
     @Operation(summary = "Get the user's total watchtime for a season in a show")
-    @GetMapping(path = ["/{showId}/season/{seasonNumber}"])
+    @GetMapping(path = ["/{broadcastId}/season/{seasonNumber}"])
     fun getSeasonWatchtime(
             @PathVariable("userId") userId: UUID,
-            @PathVariable("showId") showId: Int,
+            @PathVariable("broadcastId") broadcastId: Int,
             @PathVariable("seasonNumber") seasonNumber: Int,
     ): WatchtimeFormat {
-        return WatchtimeFormat.build(broadcastService.getSeasonWatchtime(userId, userService.getSerializedBroadcast(userId, showId), seasonNumber))
+        return WatchtimeFormat.build(broadcastService.getSeasonWatchtime(userId, userService.getSerializedBroadcast(userId, broadcastId), seasonNumber))
     }
 
 }

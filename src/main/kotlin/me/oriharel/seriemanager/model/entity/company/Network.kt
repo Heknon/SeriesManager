@@ -1,7 +1,7 @@
 package me.oriharel.seriemanager.model.entity.company
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import me.oriharel.seriemanager.Routes
+import me.oriharel.seriemanager.utility.Routes
 
 data class Network(
         @JsonProperty("logo_path") override val logo: String?,

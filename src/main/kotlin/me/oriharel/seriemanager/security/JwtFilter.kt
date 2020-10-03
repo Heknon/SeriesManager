@@ -1,6 +1,5 @@
 package me.oriharel.seriemanager.security
 
-import me.oriharel.seriemanager.service.SeriesManagerUserDetailsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -30,6 +29,7 @@ class JwtFilter : OncePerRequestFilter() {
                 username = jwtUtility.extractUsername(token)
             } catch (e: Exception) {
                 res.sendError(1, "Internal Server Error - Cannot validate JWT")
+                throw e
             }
         }
 

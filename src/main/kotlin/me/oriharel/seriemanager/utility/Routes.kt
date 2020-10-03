@@ -1,4 +1,4 @@
-package me.oriharel.seriemanager
+package me.oriharel.seriemanager.utility
 
 object Routes {
     const val API_KEY = "e721a557dd172dbdaf21acbec3976df2"
