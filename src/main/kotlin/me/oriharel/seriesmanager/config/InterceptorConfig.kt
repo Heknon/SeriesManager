@@ -13,6 +13,10 @@ class InterceptorConfig : WebMvcConfigurer {
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(sameUserCheckInterceptor)
-                .addPathPatterns("/api/v1/user/**/watchtime/**", "/api/v1/user/**/broadcast/**")
+                .addPathPatterns(
+                        "/api/v1/user/**/watchtime/**",
+                        "/api/v1/user/**/broadcast/**",
+                        "/api/v1/user/**/recommend/**",
+                )
     }
 }

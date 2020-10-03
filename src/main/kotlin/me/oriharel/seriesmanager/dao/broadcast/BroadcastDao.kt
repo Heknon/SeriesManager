@@ -41,4 +41,12 @@ interface BroadcastDao {
     fun getShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int
 
     fun getSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int
+
+    fun getTopRated(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast>
+
+    fun getPopular(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast>
+
+    fun getSimilar(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast>
+
+    fun getRecommended(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast>
 }

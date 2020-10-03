@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.datetime.Instant
+import me.oriharel.seriesmanager.model.entity.company.Network
 import me.oriharel.seriesmanager.utility.Routes
 
 @JsonIgnoreProperties(value = ["watched"])
@@ -24,6 +25,7 @@ open class TVShow @JsonCreator constructor(
         @JsonProperty("media_type", defaultValue = "tv", required = false) open val type: String? = "tv",
         @JsonProperty("watched") override var watched: Boolean,
         @JsonProperty("broadcast_count") override val broadcastCount: Int = -1,
+        @JsonProperty("networks") val networks: List<Network>?,
 ) : Broadcast(
         id,
         poster,

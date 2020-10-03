@@ -80,4 +80,20 @@ class BroadcastService @Autowired constructor(@Qualifier("broadcastDao") private
     fun getSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int {
         return broadcastDao.getSeasonWatchtime(id, serializedBroadcast, season)
     }
+
+    fun getTopRated(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
+        return broadcastDao.getTopRated(serializedBroadcast, page)
+    }
+
+    fun getPopular(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
+        return broadcastDao.getPopular(serializedBroadcast, page)
+    }
+
+    fun getSimilar(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
+        return broadcastDao.getSimilar(serializedBroadcast, page)
+    }
+
+    fun getRecommended(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
+        return broadcastDao.getRecommended(serializedBroadcast, page)
+    }
 }

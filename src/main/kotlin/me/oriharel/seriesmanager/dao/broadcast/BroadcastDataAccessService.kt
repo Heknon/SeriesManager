@@ -9,6 +9,7 @@ import me.oriharel.seriesmanager.utility.getJsonObject
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
 import org.springframework.web.server.ResponseStatusException
+import java.net.URL
 import java.util.*
 
 @Repository("broadcastDao")
@@ -42,27 +43,9 @@ class BroadcastDataAccessService : BroadcastDao {
         return Routes.TMDB.getTVEpisodeEndpoint(serializedBroadcast.id!!, season, episode).convertURLJsonResponse()
     }
 
-    override fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast?> {
+    override fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast> {
         val url = Routes.TMDB.getSearchEndpoint(searchType, query, page, adult)
-        val jo = url.getJsonObject().getJSONArray("results")
-        val results = mutableListOf<Broadcast?>()
-
-        for (i in 0 until jo.length()) {
-            val o = jo.getJSONObject(i)
-            val mediaType = if (o.has("media_type")) o["media_type"] else searchType.name.toLowerCase()
-            if (mediaType == "tv" || mediaType == "movie") {
-                val oAsStr = o.toString(0)
-                results.add(
-                        when (mediaType) {
-                            "movie" -> Mapper.mapper.readValue<Movie>(oAsStr, Movie::class.java)
-                            "tv" -> Mapper.mapper.readValue<TVShow>(oAsStr, TVShow::class.java)
-                            else -> null
-                        }
-                )
-            }
-        }
-
-        return results
+        return getBroadcastsFromJSONList(url, searchType)
     }
 
     override fun episodesRemainingInShow(serializedBroadcast: UserSerializedBroadcast): Int {
@@ -200,6 +183,52 @@ class BroadcastDataAccessService : BroadcastDao {
             return bc.runtime[0] * (bc.seasons[season - 1].episodeCount - episodesRemainingInSeason(serializedBroadcast, season.toShort()))
         }
         return 0
+    }
+
+    override fun getTopRated(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
+        val searchType = if (serializedBroadcast.isMovie) SearchType.Movie else SearchType.Tv
+        val url = Routes.TMDB.getTopEndpoint(searchType, page)
+        return getBroadcastsFromJSONList(url, searchType)
+    }
+
+    override fun getPopular(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
+        val searchType = if (serializedBroadcast.isMovie) SearchType.Movie else SearchType.Tv
+        val url = Routes.TMDB.getPopularEndpoint(searchType, page)
+        return getBroadcastsFromJSONList(url, searchType)
+    }
+
+    override fun getSimilar(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
+        val searchType = if (serializedBroadcast.isMovie) SearchType.Movie else SearchType.Tv
+        val url = Routes.TMDB.getSimilarEndpoint(searchType, serializedBroadcast.id!!, page)
+        return getBroadcastsFromJSONList(url, searchType)
+    }
+
+    override fun getRecommended(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
+        val searchType = if (serializedBroadcast.isMovie) SearchType.Movie else SearchType.Tv
+        val url = Routes.TMDB.getRecommendationEndpoint(searchType, serializedBroadcast.id!!, page)
+        return getBroadcastsFromJSONList(url, searchType)
+    }
+
+    private fun getBroadcastsFromJSONList(url: String, searchType: SearchType): List<Broadcast> {
+        val jo = url.getJsonObject().getJSONArray("results")
+        val results = mutableListOf<Broadcast?>()
+
+        for (i in 0 until jo.length()) {
+            val o = jo.getJSONObject(i)
+            val mediaType = if (o.has("media_type")) o["media_type"] else searchType.name.toLowerCase()
+            if (mediaType == "tv" || mediaType == "movie") {
+                val oAsStr = o.toString(0)
+                results.add(
+                        when (mediaType) {
+                            "movie" -> Mapper.mapper.readValue<Movie>(oAsStr, Movie::class.java)
+                            "tv" -> Mapper.mapper.readValue<TVShow>(oAsStr, TVShow::class.java)
+                            else -> null
+                        }
+                )
+            }
+        }
+
+        return results.filterNotNull()
     }
 
     private fun getBroadcastsFromId(id: UUID, userService: UserService): List<Optional<Broadcast>> {

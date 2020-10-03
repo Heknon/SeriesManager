@@ -46,6 +46,7 @@ inline fun <reified T> String.convertURLJsonResponse(): T {
 }
 
 fun String.getJsonObject(): JSONObject {
+    println(this)
     val text = URL(this.replace(" ", "%20")).readText()
     return JSONObject(text)
 }

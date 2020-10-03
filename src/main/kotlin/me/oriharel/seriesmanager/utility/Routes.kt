@@ -10,19 +10,19 @@ object Routes {
         const val IMAGES_API = "https://image.tmdb.org/t/p/w500"
 
         fun getPopularEndpoint(searchType: SearchType, page: Int): String {
-            return "$BASE_URL/${searchType.name.toLowerCase()}/popular?&page=$page$ENDPOINT_END"
+            return "$BASE_URL/${searchType.name.toLowerCase()}/popular?page=$page&$ENDPOINT_END"
         }
 
         fun getTopEndpoint(searchType: SearchType, page: Int): String {
-            return "$BASE_URL/${searchType.name.toLowerCase()}/top_rated?&page=$page$ENDPOINT_END"
+            return "$BASE_URL/${searchType.name.toLowerCase()}/top_rated?page=$page&$ENDPOINT_END"
         }
 
         fun getSimilarEndpoint(searchType: SearchType, broadcastId: Int, page: Int): String {
-            return "$BASE_URL/${searchType.name.toLowerCase()}/$broadcastId/similar?&page=$page$ENDPOINT_END"
+            return "$BASE_URL/${searchType.name.toLowerCase()}/$broadcastId/similar?page=$page&$ENDPOINT_END"
         }
 
         fun getRecommendationEndpoint(searchType: SearchType, broadcastId: Int, page: Int): String {
-            return "$BASE_URL/${searchType.name.toLowerCase()}/$broadcastId/recommendations?&page=$page$ENDPOINT_END"
+            return "$BASE_URL/${searchType.name.toLowerCase()}/$broadcastId/recommendations?page=$page&$ENDPOINT_END"
         }
 
         fun getTVShowEndpoint(id: Int): String {

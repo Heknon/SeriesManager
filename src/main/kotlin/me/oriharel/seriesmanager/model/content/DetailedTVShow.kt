@@ -18,7 +18,6 @@ class DetailedTVShow @JsonCreator constructor(
         @JsonProperty("last_air_date") val lastAirDate: Instant?,
         @JsonProperty("last_episode_to_air") val lastEpisodeToAir: Episode?,
         @JsonProperty("next_episode_to_air") val nextEpisodeToAir: Episode?,
-        @JsonProperty("networks") val networks: List<Network>,
         @JsonProperty("number_of_episodes") val numberOfEpisodes: Int,
         @JsonProperty("number_of_seasons") val numberOfSeasons: Int,
         @JsonProperty("production_companies") override val productionCompanies: List<ProductionCompany>,
@@ -27,6 +26,7 @@ class DetailedTVShow @JsonCreator constructor(
         @JsonProperty("type") override val type: String,
         @JsonProperty("poster_path") poster: String?,
         @JsonProperty("popularity") popularity: Double,
+        @JsonProperty("networks") networks: List<Network>,
         @JsonProperty("id") id: Int,
         @JsonProperty("backdrop_path") backdrop: String?,
         @JsonProperty("vote_average") voteAverage: Double,
@@ -55,7 +55,8 @@ class DetailedTVShow @JsonCreator constructor(
         originalName,
         type,
         watched,
-        numberOfEpisodes
+        numberOfEpisodes,
+        networks
 
 ), DetailedBroadcast {
     override fun toString(): String {
