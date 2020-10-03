@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>me.oriharel</groupId>
-	<artifactId>seriemanager</artifactId>
+	<artifactId>seriesmanager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>seriemanager</name>
+	<name>SeriesManager</name>
 	<description>Manage, track, find shows and movies</description>
 
 	<properties>
