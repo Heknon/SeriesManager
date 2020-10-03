@@ -21,7 +21,7 @@ open class TVShow @JsonCreator constructor(
         @JsonProperty("vote_count") override val voteCount: Int,
         @JsonProperty("name") override val name: String,
         @JsonProperty("original_name") val originalName: String,
-        @JsonProperty("media_type") open val type: String,
+        @JsonProperty("media_type", defaultValue = "tv", required = false) open val type: String? = "tv",
         @JsonProperty("watched") override var watched: Boolean,
         @JsonProperty("broadcast_count") override val broadcastCount: Int = -1,
 ) : Broadcast(
@@ -35,7 +35,7 @@ open class TVShow @JsonCreator constructor(
         broadcastCount,
         releaseDate
 ) {
-    val backdropUrl = "${Routes.IMAGES_API}$backdrop"
+    val backdropUrl = "${Routes.TMDB.IMAGES_API}$backdrop"
     override fun toString(): String {
         return "TVShow(poster=$poster, popularity=$popularity, id=$id, backdrop=$backdrop, voteAverage=$voteAverage, overview='$overview', releaseDate=$releaseDate, originCountry=$originCountry, genreIds=$genreIds, originalLanguage='$originalLanguage', voteCount=$voteCount, name='$name', originalName='$originalName', type='$type', watched=$watched, broadcastCount=$broadcastCount, backdropUrl='$backdropUrl')"
     }

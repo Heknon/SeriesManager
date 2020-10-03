@@ -9,5 +9,5 @@ class ProductionCompany(
         @JsonProperty("id") override val id: Int,
         @JsonProperty("name") override val name: String,
 ) : Company {
-    val logoUrl = "${Routes.IMAGES_API}/$logo"
+    val logoUrl = "${Routes.TMDB.IMAGES_API}/$logo"
 }

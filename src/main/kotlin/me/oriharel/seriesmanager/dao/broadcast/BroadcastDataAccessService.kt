@@ -20,9 +20,9 @@ class BroadcastDataAccessService : BroadcastDao {
     override fun getDetailedBroadcast(serializedBroadcast: UserSerializedBroadcast): Optional<Broadcast> {
         try {
             val broadcast: Broadcast = when (serializedBroadcast.type) {
-                "movie" -> getMovieEndpoint(serializedBroadcast.id
+                "movie" -> Routes.TMDB.getMovieEndpoint(serializedBroadcast.id
                         ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedMovie>()
-                "tv" -> getTVShowEndpoint(serializedBroadcast.id
+                "tv" -> Routes.TMDB.getTVShowEndpoint(serializedBroadcast.id
                         ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedTVShow>()
                 else -> return Optional.empty()
             }
@@ -35,21 +35,21 @@ class BroadcastDataAccessService : BroadcastDao {
     }
 
     override fun getDetailedSeason(serializedBroadcast: UserSerializedBroadcast, season: Int): Season {
-        return getTVSeasonEndpoint(serializedBroadcast.id!!, season).convertURLJsonResponse()
+        return Routes.TMDB.getTVSeasonEndpoint(serializedBroadcast.id!!, season).convertURLJsonResponse()
     }
 
     override fun getDetailedEpisode(serializedBroadcast: UserSerializedBroadcast, season: Int, episode: Int): Episode {
-        return getTVEpisodeEndpoint(serializedBroadcast.id!!, season, episode).convertURLJsonResponse()
+        return Routes.TMDB.getTVEpisodeEndpoint(serializedBroadcast.id!!, season, episode).convertURLJsonResponse()
     }
 
     override fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast?> {
-        val url = getSearchEndpoint(searchType, query, page, adult)
+        val url = Routes.TMDB.getSearchEndpoint(searchType, query, page, adult)
         val jo = url.getJsonObject().getJSONArray("results")
         val results = mutableListOf<Broadcast?>()
 
         for (i in 0 until jo.length()) {
             val o = jo.getJSONObject(i)
-            val mediaType = o["media_type"]
+            val mediaType = if (o.has("media_type")) o["media_type"] else searchType.name.toLowerCase()
             if (mediaType == "tv" || mediaType == "movie") {
                 val oAsStr = o.toString(0)
                 results.add(
@@ -212,27 +212,5 @@ class BroadcastDataAccessService : BroadcastDao {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist")
         }
         return broadcastsOptional.get()
-    }
-
-    companion object {
-        private fun getTVShowEndpoint(id: Int): String {
-            return "${Routes.BASE_URL}/tv/${id}?${Routes.ENDPOINT_END}"
-        }
-
-        private fun getTVSeasonEndpoint(id: Int, season: Int): String {
-            return "${Routes.BASE_URL}/tv/${id}/season/${season}?${Routes.ENDPOINT_END}"
-        }
-
-        private fun getTVEpisodeEndpoint(id: Int, season: Int, episode: Int): String {
-            return "${Routes.BASE_URL}/tv/${id}/season/${season}/episode/${episode}?${Routes.ENDPOINT_END}"
-        }
-
-        private fun getMovieEndpoint(id: Int): String {
-            return "${Routes.BASE_URL}/movie/${id}?${Routes.ENDPOINT_END}"
-        }
-
-        private fun getSearchEndpoint(searchType: SearchType, query: String, page: Int, adult: Boolean): String {
-            return "${Routes.BASE_URL}/search/${searchType.name.toLowerCase()}?query=${query}&page=${page}&include_adult=${adult}&${Routes.ENDPOINT_END}"
-        }
     }
 }

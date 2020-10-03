@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.datetime.Instant
 import me.oriharel.seriesmanager.utility.Routes
+import javax.validation.constraints.Null
 
 @JsonIgnoreProperties(value = ["watched", "broadcast_count"])
 open class Movie @JsonCreator constructor(
@@ -22,7 +23,7 @@ open class Movie @JsonCreator constructor(
         @JsonProperty("release_date") override val releaseDate: Instant,
         @JsonProperty("vote_count") override val voteCount: Int,
         @JsonProperty("title") override val name: String,
-        @JsonProperty("media_type", defaultValue = "movie") val type: String,
+        @JsonProperty("media_type", defaultValue = "movie", required = false) val type: String? = "movie",
         @JsonProperty("watched") override var watched: Boolean,
         @JsonProperty("broadcast_count") override val broadcastCount: Int = 1,
 ) : Broadcast(
@@ -36,7 +37,7 @@ open class Movie @JsonCreator constructor(
         broadcastCount,
         releaseDate
 ) {
-    val backdropUrl = "${Routes.IMAGES_API}$backdrop"
+    val backdropUrl = "${Routes.TMDB.IMAGES_API}$backdrop"
     override fun toString(): String {
         return "Movie(adult=$adult, video=$video, backdrop=$backdrop, popularity=$popularity, originalName=$originalName, genreIds=$genreIds, originalLanguage='$originalLanguage', poster=$poster, id=$id, voteAverage=$voteAverage, overview='$overview', releaseDate=$releaseDate, voteCount=$voteCount, name='$name', type='$type', watched=$watched, broadcastCount=$broadcastCount, backdropUrl='$backdropUrl')"
     }

@@ -41,5 +41,4 @@ interface BroadcastDao {
     fun getShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int
 
     fun getSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int
-
 }

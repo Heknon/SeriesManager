@@ -36,9 +36,9 @@ class UserBroadcastController @Autowired constructor(
     @GetMapping(path = ["/search/{type}"])
     fun searchBroadcasts(
             @PathVariable("type") type: SearchType,
-            @RequestParam page: Int,
+            @RequestParam(defaultValue = "1") page: Int,
             @RequestParam query: String,
-            @RequestParam adult: Boolean,
+            @RequestParam(defaultValue = "true") adult: Boolean,
     ): List<Broadcast?> {
         return broadcastService.findBroadcasts(type, query, page, adult)
     }

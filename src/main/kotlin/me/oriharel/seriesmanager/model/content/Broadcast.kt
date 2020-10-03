@@ -19,5 +19,5 @@ abstract class Broadcast(
         @JsonProperty("broadcast_count") open val broadcastCount: Int,
         open val releaseDate: Instant?,
 ) {
-    val posterUrl get() = "${Routes.IMAGES_API}$poster"
+    val posterUrl get() = "${Routes.TMDB.IMAGES_API}$poster"
 }
