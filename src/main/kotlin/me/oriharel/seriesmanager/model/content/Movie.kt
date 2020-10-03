@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.datetime.Instant
 import me.oriharel.seriesmanager.utility.Routes
-import javax.validation.constraints.Null
 
 @JsonIgnoreProperties(value = ["watched", "broadcast_count"])
 open class Movie @JsonCreator constructor(

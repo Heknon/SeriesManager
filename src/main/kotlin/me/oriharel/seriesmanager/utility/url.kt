@@ -41,12 +41,10 @@ object Mapper {
 }
 
 inline fun <reified T> String.convertURLJsonResponse(): T {
-    println(this)
     return Mapper.mapper.readValue(URL(this), T::class.java)
 }
 
 fun String.getJsonObject(): JSONObject {
-    println(this)
     val text = URL(this.replace(" ", "%20")).readText()
     return JSONObject(text)
 }

@@ -1,6 +1,5 @@
 package me.oriharel.seriesmanager.model.entity.company
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import me.oriharel.seriesmanager.model.entity.Logo
 import me.oriharel.seriesmanager.utility.Routes

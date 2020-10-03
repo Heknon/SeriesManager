@@ -93,6 +93,14 @@ class BroadcastService @Autowired constructor(@Qualifier("broadcastDao") private
         return broadcastDao.getSimilar(serializedBroadcast, page)
     }
 
+    fun getPopular(searchType: SearchType, page: Int): List<Broadcast> {
+        return broadcastDao.getPopular(searchType, page)
+    }
+
+    fun getTopRated(searchType: SearchType, page: Int): List<Broadcast> {
+        return broadcastDao.getTopRated(searchType, page)
+    }
+
     fun getRecommended(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
         return broadcastDao.getRecommended(serializedBroadcast, page)
     }

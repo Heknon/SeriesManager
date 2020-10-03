@@ -9,7 +9,6 @@ import me.oriharel.seriesmanager.utility.getJsonObject
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
 import org.springframework.web.server.ResponseStatusException
-import java.net.URL
 import java.util.*
 
 @Repository("broadcastDao")
@@ -185,14 +184,12 @@ class BroadcastDataAccessService : BroadcastDao {
         return 0
     }
 
-    override fun getTopRated(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
-        val searchType = if (serializedBroadcast.isMovie) SearchType.Movie else SearchType.Tv
+    override fun getTopRated(searchType: SearchType, page: Int): List<Broadcast> {
         val url = Routes.TMDB.getTopEndpoint(searchType, page)
         return getBroadcastsFromJSONList(url, searchType)
     }
 
-    override fun getPopular(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {
-        val searchType = if (serializedBroadcast.isMovie) SearchType.Movie else SearchType.Tv
+    override fun getPopular(searchType: SearchType, page: Int): List<Broadcast> {
         val url = Routes.TMDB.getPopularEndpoint(searchType, page)
         return getBroadcastsFromJSONList(url, searchType)
     }
