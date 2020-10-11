@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@RequestMapping("api/v1/user/{userId}/broadcast/list", produces = ["application/json"], consumes = ["application/json"])
+@RequestMapping("api/v1/broadcast/list", produces = ["application/json"], consumes = ["application/json"])
 class MultiBroadcastListController @Autowired constructor(
         userService: UserService,
         broadcastService: BroadcastService
