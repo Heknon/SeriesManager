@@ -22,7 +22,7 @@ class BroadcastService @Autowired constructor(@Qualifier("broadcastDao") private
         return broadcastDao.getDetailedBroadcast(serializedBroadcast)
     }
 
-    fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast?> {
+    fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast> {
         return broadcastDao.findBroadcasts(searchType, query, page, adult)
     }
 

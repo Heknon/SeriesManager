@@ -16,7 +16,7 @@ import java.util.*
 
 @RestController
 @RequestMapping("api/v1/watchtime", produces = ["application/json"], consumes = ["application/json"])
-class BroadcastWatchtimeController @Autowired constructor(
+class MultiWatchtimeController @Autowired constructor(
         private val userService: UserService,
         private val broadcastService: BroadcastService,
 ) {

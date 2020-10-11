@@ -18,7 +18,7 @@ interface BroadcastDao {
 
     fun getDetailedEpisode(serializedBroadcast: UserSerializedBroadcast, season: Int, episode: Int): Episode
 
-    fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast?>
+    fun findBroadcasts(searchType: SearchType, query: String, page: Int, adult: Boolean): List<Broadcast>
 
     fun episodesRemainingInShow(serializedBroadcast: UserSerializedBroadcast): Int
 

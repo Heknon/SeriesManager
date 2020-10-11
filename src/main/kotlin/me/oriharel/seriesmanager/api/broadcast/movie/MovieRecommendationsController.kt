@@ -1,27 +1,25 @@
-package me.oriharel.seriesmanager.api.broadcast.tv
+package me.oriharel.seriesmanager.api.broadcast.movie
 
 import io.swagger.v3.oas.annotations.Operation
-import me.oriharel.seriesmanager.api.broadcast.UserRecommendationsController
+import me.oriharel.seriesmanager.api.broadcast.RecommendationsController
 import me.oriharel.seriesmanager.dao.broadcast.SearchType
 import me.oriharel.seriesmanager.model.content.Broadcast
-import me.oriharel.seriesmanager.security.CurrentUser
 import me.oriharel.seriesmanager.service.BroadcastService
 import me.oriharel.seriesmanager.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import java.util.*
 
 @RestController
-@RequestMapping("api/v1/tv/recommend", produces = ["application/json"])
-class TVUserRecommendationsController constructor(
+@RequestMapping("api/v1/movie/recommend", produces = ["application/json"])
+class MovieRecommendationsController @Autowired constructor(
         userService: UserService,
         broadcastService: BroadcastService,
-) : UserRecommendationsController(
+) : RecommendationsController(
         userService,
         broadcastService,
-        SearchType.Tv
+        SearchType.Movie
 ) {
-    @Operation(summary = "Get similar, recommended, top, and popular tv shows for each tv show user is following")
+    @Operation(summary = "Get similar, recommended, top, and popular movies for each movie user is following")
     @GetMapping
     override fun getRecommendations(
             @RequestParam(defaultValue = "false") similar: Boolean?,
@@ -45,7 +43,7 @@ class TVUserRecommendationsController constructor(
         )
     }
 
-    @Operation(summary = "Get similar, recommended, top, and popular broadcasts for a specific tv show")
+    @Operation(summary = "Get similar, recommended, top, and popular movies for a specific movie")
     @GetMapping(path = ["/{broadcastId}"])
     override fun getRecommendationsById(
             @PathVariable("broadcastId") broadcastId: Int,

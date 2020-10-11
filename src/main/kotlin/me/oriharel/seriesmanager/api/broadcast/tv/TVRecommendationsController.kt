@@ -1,27 +1,24 @@
-package me.oriharel.seriesmanager.api.broadcast.movie
+package me.oriharel.seriesmanager.api.broadcast.tv
 
 import io.swagger.v3.oas.annotations.Operation
-import me.oriharel.seriesmanager.api.broadcast.UserRecommendationsController
+import me.oriharel.seriesmanager.api.broadcast.RecommendationsController
 import me.oriharel.seriesmanager.dao.broadcast.SearchType
 import me.oriharel.seriesmanager.model.content.Broadcast
-import me.oriharel.seriesmanager.security.CurrentUser
 import me.oriharel.seriesmanager.service.BroadcastService
 import me.oriharel.seriesmanager.service.UserService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import java.util.*
 
 @RestController
-@RequestMapping("api/v1/movie/recommend", produces = ["application/json"])
-class MovieUserRecommendationsController @Autowired constructor(
+@RequestMapping("api/v1/tv/recommend", produces = ["application/json"])
+class TVRecommendationsController constructor(
         userService: UserService,
         broadcastService: BroadcastService,
-) : UserRecommendationsController(
+) : RecommendationsController(
         userService,
         broadcastService,
-        SearchType.Movie
+        SearchType.Tv
 ) {
-    @Operation(summary = "Get similar, recommended, top, and popular movies for each movie user is following")
+    @Operation(summary = "Get similar, recommended, top, and popular tv shows for each tv show user is following")
     @GetMapping
     override fun getRecommendations(
             @RequestParam(defaultValue = "false") similar: Boolean?,
@@ -45,7 +42,7 @@ class MovieUserRecommendationsController @Autowired constructor(
         )
     }
 
-    @Operation(summary = "Get similar, recommended, top, and popular movies for a specific movie")
+    @Operation(summary = "Get similar, recommended, top, and popular broadcasts for a specific tv show")
     @GetMapping(path = ["/{broadcastId}"])
     override fun getRecommendationsById(
             @PathVariable("broadcastId") broadcastId: Int,
