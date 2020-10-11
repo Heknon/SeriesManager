@@ -8,7 +8,7 @@ interface DetailedBroadcast {
     val productionCompanies: List<ProductionCompany>
     val status: String
     var lists: Set<String>?
-    val mediaType: String
+    val mediaType: String?
 
     val searchType get() = if (mediaType.equals("movie", ignoreCase = true)) SearchType.Movie else SearchType.Tv
 }

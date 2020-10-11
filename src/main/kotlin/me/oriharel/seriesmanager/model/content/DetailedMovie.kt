@@ -1,6 +1,7 @@
 package me.oriharel.seriesmanager.model.content
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import kotlinx.datetime.Instant
@@ -8,7 +9,7 @@ import me.oriharel.seriesmanager.model.entity.Country
 import me.oriharel.seriesmanager.model.entity.Language
 import me.oriharel.seriesmanager.model.entity.company.ProductionCompany
 
-@JsonIgnoreProperties(value = ["watched"])
+@JsonIgnoreProperties(value = ["watched", "mediaType", "lists"])
 class DetailedMovie @JsonCreator constructor(
         @JsonProperty("belongs_to_collection") val belongsToCollection: Any?,
         @JsonProperty("budget") val budget: Int,
@@ -37,7 +38,7 @@ class DetailedMovie @JsonCreator constructor(
         @JsonProperty("status") override val status: String,
         @JsonProperty("watched") watched: Boolean,
         @JsonProperty("lists") override var lists: Set<String>? = mutableSetOf(),
-        override val mediaType: String = "movie"
+        @JsonProperty("mediaType") override val mediaType: String = "movie"
 ) : Movie(
         adult,
         video,

@@ -11,8 +11,7 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class SameUserCheckInterceptor : HandlerInterceptor {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val givenUserId = UUID.fromString((request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE) as Map<*, *>)["userId"] as String)
-        if (CurrentUser.currentUserIsAdmin || CurrentUser.currentUserId == givenUserId) {
+        if (CurrentUser.currentUserIsAdmin || CurrentUser.isLoggedIn) {
             return true
         }
         response.sendError(401, "You must use your own user ID")

@@ -48,7 +48,7 @@ class TVBroadcastListController @Autowired constructor(
     @GetMapping("/{listName}")
     override fun getBroadcastsOfList(
             @PathVariable listName: String,
-            @RequestParam detailed: Boolean,
+            @RequestParam(defaultValue = "true") detailed: Boolean,
     ): List<Any> {
         return super.getBroadcastsOfList(listName, detailed)
     }

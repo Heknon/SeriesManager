@@ -27,6 +27,15 @@ class MovieBroadcastListController @Autowired constructor(
     }
 
     @Operation(summary = "Add a movie to a content list")
+    @PostMapping("/{listName}/{broadcastId}")
+    override fun addListToBroadcast(
+            @PathVariable listName: String,
+            @PathVariable broadcastId: Int,
+    ): UserSerializedBroadcast {
+        return super.addListToBroadcast(listName, broadcastId)
+    }
+
+    @Operation(summary = "Remove a movie from a content list")
     @DeleteMapping("/{listName}/{broadcastId}")
     override fun removeListFromBroadcast(
             @PathVariable listName: String,
@@ -39,7 +48,7 @@ class MovieBroadcastListController @Autowired constructor(
     @GetMapping("/{listName}")
     override fun getBroadcastsOfList(
             @PathVariable listName: String,
-            @RequestParam detailed: Boolean,
+            @RequestParam(defaultValue = "true") detailed: Boolean,
     ): List<Any> {
         return super.getBroadcastsOfList(listName, detailed)
     }

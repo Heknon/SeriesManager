@@ -13,10 +13,8 @@ class InterceptorConfig : WebMvcConfigurer {
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(sameUserCheckInterceptor)
-                .addPathPatterns(
-                        "/api/v1/**"
-                ).excludePathPatterns(
-                        "/api/v1/auth/**"
-                )
+                .excludePathPatterns("/**")
+                .addPathPatterns("/api/v1/**")
+                .excludePathPatterns("/api/v1/auth/**")
     }
 }

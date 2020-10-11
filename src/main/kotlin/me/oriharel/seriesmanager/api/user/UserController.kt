@@ -31,8 +31,9 @@ class UserController @Autowired constructor(private val userService: UserService
      */
     @Operation(summary = "Get all users registered")
     @GetMapping
-    fun getAllUsers(): List<User> {
-        return userService.getAllUsers()
+    fun getAllUsers(): Any {
+        val users = userService.getAllUsers()
+        return if (users.size == 1) users[0] else users
     }
 
     /**
