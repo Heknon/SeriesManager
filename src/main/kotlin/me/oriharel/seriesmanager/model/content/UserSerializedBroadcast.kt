@@ -14,10 +14,10 @@ data class UserSerializedBroadcast @JsonCreator constructor(
         @NotBlank @JsonProperty("type") val type: String,
         @NotNull @Min(1) @JsonProperty("id") val id: Int?,
         @JsonProperty("watched") val watched: MutableMap<Short, MutableSet<Short>>? = mutableMapOf(),
-        @JsonProperty("lists") val lists: MutableList<String> = mutableListOf(),
+        @JsonProperty("lists") val lists: MutableSet<String> = mutableSetOf(),
 ) {
     constructor(tmdbId: Int, broadcast: UserSerializedBroadcast) : this(broadcast.type, tmdbId, broadcast.watched, broadcast.lists)
-    constructor(id: Int, searchType: SearchType, safe: Boolean = true) : this(searchType.toString().toLowerCase(), id, mutableMapOf(), mutableListOf()) {
+    constructor(id: Int, searchType: SearchType, safe: Boolean = true) : this(searchType.toString().toLowerCase(), id, mutableMapOf(), mutableSetOf()) {
         if (safe && searchType == SearchType.Multi) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Type must be 'movie' or 'tv'")
         }

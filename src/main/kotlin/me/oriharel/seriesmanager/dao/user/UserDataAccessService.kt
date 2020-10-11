@@ -176,11 +176,19 @@ class UserDataAccessService : UserDao {
         return true
     }
 
-    override fun addListToShow(id: UUID, listName: String, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
+    override fun addListToBroadcast(id: UUID, listName: String, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
         val bcOp = getBroadcastById(id, serializedBroadcast)
         if (bcOp.isEmpty) return Optional.empty()
         val bc = bcOp.get()
         bc.lists.add(listName)
+        return updateBroadcast(id, bc)
+    }
+
+    override fun removeListFromBroadcast(id: UUID, listName: String, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
+        val bcOp = getBroadcastById(id, serializedBroadcast)
+        if (bcOp.isEmpty) return Optional.empty()
+        val bc = bcOp.get()
+        bc.lists.remove(listName)
         return updateBroadcast(id, bc)
     }
 
@@ -192,6 +200,10 @@ class UserDataAccessService : UserDao {
         }
 
         return jwtUtility.generateToken(authRequest.username, if (authRequest.stayLoggedIn == true) 1000000 else 10)
+    }
+
+    override fun getSerializedBroadcastsOfList(id: UUID, listName: String): List<UserSerializedBroadcast> {
+        return getUserById(id).get().broadcasts.filter { it.lists.contains(listName) }
     }
 
     fun updateSerializedBroadcast(id: UUID, serializedBroadcast: UserSerializedBroadcast) {

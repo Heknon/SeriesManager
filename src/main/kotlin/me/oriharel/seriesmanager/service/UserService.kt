@@ -77,8 +77,16 @@ class UserService @Autowired constructor(@Qualifier("userDao") private val userD
         return userDao.generateJwtToken(authRequest)
     }
 
-    fun addListToShow(userId: UUID = CurrentUser.currentUserIdMustBeLoggedIn, listName: String, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
-        return userDao.addListToShow(userId, listName, serializedBroadcast)
+    fun addListToBroadcast(userId: UUID = CurrentUser.currentUserIdMustBeLoggedIn, listName: String, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
+        return userDao.addListToBroadcast(userId, listName, serializedBroadcast)
+    }
+
+    fun removeListFromBroadcast(userId: UUID = CurrentUser.currentUserIdMustBeLoggedIn, listName: String, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
+        return userDao.removeListFromBroadcast(userId, listName, serializedBroadcast)
+    }
+
+    fun getSerializedBroadcastsOfList(userId: UUID = CurrentUser.currentUserIdMustBeLoggedIn, listName: String): List<UserSerializedBroadcast> {
+        return userDao.getSerializedBroadcastsOfList(userId, listName)
     }
 
     fun getSerializedBroadcast(
