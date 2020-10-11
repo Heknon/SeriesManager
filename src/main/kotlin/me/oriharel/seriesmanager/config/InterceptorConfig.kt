@@ -14,9 +14,9 @@ class InterceptorConfig : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(sameUserCheckInterceptor)
                 .addPathPatterns(
-                        "/api/v1/user/**/watchtime/**",
-                        "/api/v1/user/**/broadcast/**",
-                        "/api/v1/user/**/recommend/**",
+                        "/api/v1/**"
+                ).excludePathPatterns(
+                        "/api/v1/auth/**"
                 )
     }
 }
