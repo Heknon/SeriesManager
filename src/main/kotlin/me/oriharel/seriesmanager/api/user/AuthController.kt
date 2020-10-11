@@ -1,4 +1,4 @@
-package me.oriharel.seriesmanager.api
+package me.oriharel.seriesmanager.api.user
 
 import io.swagger.v3.oas.annotations.Operation
 import lombok.NonNull

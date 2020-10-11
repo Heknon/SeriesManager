@@ -1,4 +1,4 @@
-package me.oriharel.seriesmanager.api.user
+package me.oriharel.seriesmanager.api.broadcast
 
 import io.swagger.v3.oas.annotations.Operation
 import me.oriharel.seriesmanager.api.response.GenericBroadcastStatus
@@ -20,8 +20,8 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 
-@RestController
-@RequestMapping("api/v1/user/{userId}/broadcast", produces = ["application/json"], consumes = ["application/json"])
+    @RestController
+    @RequestMapping("api/v1/user/{userId}/broadcast", produces = ["application/json"], consumes = ["application/json"])
 class UserBroadcastController @Autowired constructor(
         private val userService: UserService,
         private val broadcastService: BroadcastService,
@@ -45,31 +45,33 @@ class UserBroadcastController @Autowired constructor(
 
     @Operation(summary = "Get all the detailed broadcasts a user is following")
     @GetMapping(path = ["/detailed"])
-    fun getDetailedBroadcasts(@PathVariable("userId") userId: UUID): List<Broadcast?> {
+    fun getDetailedBroadcasts(@PathVariable("userId") userId: UUID): List<Broadcast> {
         val optional = userService.getBroadcasts(userId)
         if (optional.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Broadcasts not found!")
-        return broadcastService.getDetailedBroadcasts(*optional.get().toTypedArray()).map {
-            if (it.isEmpty) return@map null
-            else it.get()
+        return broadcastService.getDetailedBroadcasts(*optional.get().toTypedArray()).mapNotNull {
+            if (it.isPresent) it.get()
+            else null
         }
     }
 
     @Operation(summary = "Gets a specific broadcast a user is following")
-    @GetMapping(path = ["/{broadcastId}"])
+    @GetMapping(path = ["/{broadcastId}/{searchType}"])
     fun getBroadcast(
             @PathVariable("userId") userId: UUID,
             @PathVariable("broadcastId") broadcastId: Int,
+            @PathVariable("searchType") searchType: SearchType,
     ): UserSerializedBroadcast {
-        return userService.getSerializedBroadcast(userId, broadcastId)
+        return userService.getSerializedBroadcast(userId, UserSerializedBroadcast(broadcastId, searchType))
     }
 
     @Operation(summary = "Gets a specific broadcast a user if following with extra detail")
-    @GetMapping(path = ["/{broadcastId}/detailed"])
+    @GetMapping(path = ["/{broadcastId}/{searchType}/detailed"])
     fun getDetailedBroadcast(
             @PathVariable("userId") userId: UUID,
             @PathVariable("broadcastId") broadcastId: Int,
+            @PathVariable("searchType") searchType: SearchType,
     ): Broadcast {
-        val sb = userService.getSerializedBroadcast(userId, broadcastId)
+        val sb = userService.getSerializedBroadcast(userId, UserSerializedBroadcast(broadcastId, searchType))
         val optionalBC: Optional<Broadcast> = broadcastService.getDetailedBroadcast(sb)
         if (optionalBC.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "Wrong TMDB ID!")
         return optionalBC.get()
@@ -81,30 +83,32 @@ class UserBroadcastController @Autowired constructor(
             @PathVariable("userId") userId: UUID,
             @NotNull @Valid @RequestBody serializedBroadcast: UserSerializedBroadcast,
     ): UserSerializedBroadcast {
+        if (!serializedBroadcast.isMovie && !serializedBroadcast.isTVShow)
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Invalid broadcast type. Must be 'tv' or 'movie'")
         val optional = userService.addBroadcast(userId, serializedBroadcast)
         if (optional.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User does not have this broadcast!")
         return optional.get()
     }
 
     @Operation(summary = "update a broadcast in a user's following")
-    @PutMapping(path = ["/{broadcastId}"])
+    @PutMapping
     fun updateBroadcast(
             @PathVariable("userId") userId: UUID,
-            @PathVariable("broadcastId") broadcastId: Int,
             @NotNull @Valid @RequestBody serializedBroadcast: UserSerializedBroadcast,
     ): UserSerializedBroadcast {
-        val optional = userService.updateBroadcast(userId, broadcastId, serializedBroadcast)
+        val optional = userService.updateBroadcast(userId, serializedBroadcast)
         if (optional.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User does not have this broadcast!")
         return optional.get()
     }
 
     @Operation(summary = "remove a broadcast from the user's following")
-    @DeleteMapping(path = ["/{broadcastId}"])
+    @DeleteMapping(path = ["/{broadcastId}/{searchType}"])
     fun deleteBroadcast(
             @PathVariable("userId") userId: UUID,
             @PathVariable("broadcastId") broadcastId: Int,
+            @PathVariable("searchType") searchType: SearchType,
     ): UserSerializedBroadcast {
-        val optional = userService.deleteBroadcast(userId, broadcastId)
+        val optional = userService.deleteBroadcast(userId, UserSerializedBroadcast(broadcastId, searchType))
         if (optional.isEmpty) throw ResponseStatusException(HttpStatus.NOT_FOUND, "User does not have this broadcast!")
         return optional.get()
     }
@@ -117,13 +121,14 @@ class UserBroadcastController @Autowired constructor(
     }
 
     @Operation(summary = "Set the status of a broadcast a user is following as watched or unwatched.")
-    @PostMapping(path = ["/{broadcastId}"])
+    @PostMapping(path = ["/{broadcastId}/{searchType}"])
     fun setWatchedStatus(
             @PathVariable("userId") userId: UUID,
             @PathVariable("broadcastId") broadcastId: Int,
+            @PathVariable("searchType") searchType: SearchType,
             @NotNull @Valid @RequestBody watchStatus: WatchStatus,
     ): MutableMap<String, Boolean> {
-        val sb = userService.getSerializedBroadcast(userId, broadcastId)
+        val sb = userService.getSerializedBroadcast(userId, UserSerializedBroadcast(broadcastId, searchType))
 
         if (watchStatus.watched) {
             userService.markBroadcastWatched(userId, sb, watchStatus.season, watchStatus.episode)
@@ -135,13 +140,14 @@ class UserBroadcastController @Autowired constructor(
     }
 
     @Operation(summary = "Set the status of a broadcast a user is following as watched or unwatched in bulk.")
-    @PostMapping(path = ["/{broadcastId}/bulk"])
+    @PostMapping(path = ["/{broadcastId}/{searchType}/bulk"])
     fun setWatchedStatus(
             @PathVariable("userId") userId: UUID,
             @PathVariable("broadcastId") broadcastId: Int,
+            @PathVariable("searchType") searchType: SearchType,
             @NotNull @Valid @RequestBody watchStatus: WatchStatusBulk,
     ): MutableMap<String, Boolean> {
-        val sb = userService.getSerializedBroadcast(userId, broadcastId)
+        val sb = userService.getSerializedBroadcast(userId, UserSerializedBroadcast(broadcastId, searchType))
 
         if (watchStatus.watched) {
             userService.markBroadcastWatched(userId, sb, watchStatus.season, *watchStatus.episodes)
@@ -159,14 +165,15 @@ class UserBroadcastController @Autowired constructor(
                     "When a show is passed with a season number and episode number you get the watch status of the episode, remaining episodes in the season and remaining episodes in the show\n" +
                     "When a show is passed with only a season number you get whether the user watched the whole season, remaining episodes in the season and remaining episodes in the show\n" +
                     "When a show is passed without a season number or episode number you get whether the user watched the whole show and the number of remaining episodes in the show")
-    @GetMapping(path = ["/{broadcastId}/status"])
+    @GetMapping(path = ["/{broadcastId}/{searchType}/status"])
     fun getStatus(
             @PathVariable("userId") userId: UUID,
             @PathVariable("broadcastId") broadcastId: Int,
+            @PathVariable("searchType") searchType: SearchType,
             @RequestParam season: Int?,
             @RequestParam episode: Int?,
     ): GenericBroadcastStatus {
-        val sb = userService.getSerializedBroadcast(userId, broadcastId)
+        val sb = userService.getSerializedBroadcast(userId, UserSerializedBroadcast(broadcastId, searchType))
         val bc = broadcastService.getDetailedBroadcast(sb).get()
         val status = GenericBroadcastStatus()
         val isEpisode = season != null && episode != null
@@ -207,23 +214,25 @@ class UserBroadcastController @Autowired constructor(
     }
 
     @Operation(summary = "Get in depth details about a specific season in a show")
-    @GetMapping("/{broadcastId}/season/{season}")
+    @GetMapping("/{broadcastId}/{searchType}/season/{season}")
     fun getDetailedSeason(
             @PathVariable("userId") userId: UUID,
             @PathVariable("broadcastId") broadcastId: Int,
+            @PathVariable("searchType") searchType: SearchType,
             @PathVariable("season") season: Int,
     ): Season {
-        return broadcastService.getDetailedSeason(userService.getSerializedBroadcast(userId, broadcastId), season)
+        return broadcastService.getDetailedSeason(userService.getSerializedBroadcast(userId, UserSerializedBroadcast(broadcastId, searchType)), season)
     }
 
     @Operation(summary = "Get in depth details about a specific episode in a show")
-    @GetMapping("/{broadcastId}/season/{season}/episode/{episode}")
+    @GetMapping("/{broadcastId}/{searchType}/season/{season}/episode/{episode}")
     fun getDetailedEpisode(
             @PathVariable("userId") userId: UUID,
             @PathVariable("broadcastId") broadcastId: Int,
+            @PathVariable("searchType") searchType: SearchType,
             @PathVariable("season") season: Int,
             @PathVariable("episode") episode: Int,
     ): Episode {
-        return broadcastService.getDetailedEpisode(userService.getSerializedBroadcast(userId, broadcastId), season, episode)
+        return broadcastService.getDetailedEpisode(userService.getSerializedBroadcast(userId, UserSerializedBroadcast(broadcastId, searchType)), season, episode)
     }
 }

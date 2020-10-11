@@ -36,6 +36,8 @@ class DetailedMovie @JsonCreator constructor(
         @JsonProperty("spoken_languages") val languages: List<Language>,
         @JsonProperty("status") override val status: String,
         @JsonProperty("watched") watched: Boolean,
+        @JsonProperty("lists") override var lists: List<String>? = mutableListOf(),
+        override val mediaType: String = "movie"
 ) : Movie(
         adult,
         video,

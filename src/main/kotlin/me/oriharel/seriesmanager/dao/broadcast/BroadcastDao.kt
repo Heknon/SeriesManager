@@ -12,6 +12,8 @@ interface BroadcastDao {
 
     fun getDetailedBroadcast(serializedBroadcast: UserSerializedBroadcast): Optional<Broadcast>
 
+    fun getDetailedBroadcastMulti(broadcastId: Int, userService: UserService): Optional<List<Broadcast>>
+
     fun getDetailedSeason(serializedBroadcast: UserSerializedBroadcast, season: Int): Season
 
     fun getDetailedEpisode(serializedBroadcast: UserSerializedBroadcast, season: Int, episode: Int): Episode
@@ -32,15 +34,15 @@ interface BroadcastDao {
 
     fun getMaxWatchtime(id: UUID, userService: UserService): Int
 
-    fun getMaxShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int
+    fun getMaxShowWatchtime(id: UUID, broadcastId: Int, searchType: SearchType): Int
 
-    fun getMaxSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int
+    fun getMaxSeasonWatchtime(id: UUID, broadcastId: Int, searchType: SearchType, season: Int): Int
 
     fun getWatchtime(id: UUID, userService: UserService): Int
 
-    fun getShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int
+    fun getShowWatchtime(id: UUID, broadcastId: Int, searchType: SearchType): Int
 
-    fun getSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int
+    fun getSeasonWatchtime(id: UUID, broadcastId: Int, searchType: SearchType, season: Int): Int
 
     fun getTopRated(searchType: SearchType, page: Int): List<Broadcast>
 

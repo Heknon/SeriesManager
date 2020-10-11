@@ -1,4 +1,4 @@
-package me.oriharel.seriesmanager.api.user
+package me.oriharel.seriesmanager.api.broadcast
 
 import io.swagger.v3.oas.annotations.Operation
 import me.oriharel.seriesmanager.model.content.Broadcast

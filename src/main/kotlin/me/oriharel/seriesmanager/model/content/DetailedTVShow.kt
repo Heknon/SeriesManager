@@ -39,6 +39,8 @@ class DetailedTVShow @JsonCreator constructor(
         @JsonProperty("name") name: String,
         @JsonProperty("original_name") originalName: String,
         @JsonProperty("watched") watched: Boolean,
+        @JsonProperty("lists") override var lists: List<String>? = mutableListOf(),
+        override val mediaType: String = "tv"
 ) : TVShow(
         poster,
         popularity,

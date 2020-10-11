@@ -6,6 +6,7 @@ import me.oriharel.seriesmanager.model.content.Broadcast
 import me.oriharel.seriesmanager.model.content.Episode
 import me.oriharel.seriesmanager.model.content.Season
 import me.oriharel.seriesmanager.model.content.UserSerializedBroadcast
+import me.oriharel.seriesmanager.security.CurrentUser
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
@@ -57,28 +58,28 @@ class BroadcastService @Autowired constructor(@Qualifier("broadcastDao") private
         return broadcastDao.getDetailedEpisode(serializedBroadcast, season, episode)
     }
 
-    fun getMaxWatchtime(id: UUID, userService: UserService): Int {
+    fun getMaxWatchtime(id: UUID = CurrentUser.currentUserIdMustBeLoggedIn, userService: UserService): Int {
         return broadcastDao.getMaxWatchtime(id, userService)
     }
 
-    fun getMaxShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int {
-        return broadcastDao.getMaxShowWatchtime(id, serializedBroadcast)
+    fun getMaxShowWatchtime(id: UUID = CurrentUser.currentUserIdMustBeLoggedIn, broadcastId: Int, searchType: SearchType): Int {
+        return broadcastDao.getMaxShowWatchtime(id, broadcastId, searchType)
     }
 
-    fun getMaxSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int {
-        return broadcastDao.getMaxSeasonWatchtime(id, serializedBroadcast, season)
+    fun getMaxSeasonWatchtime(id: UUID = CurrentUser.currentUserIdMustBeLoggedIn, broadcastId: Int, searchType: SearchType, season: Int): Int {
+        return broadcastDao.getMaxSeasonWatchtime(id, broadcastId, searchType, season)
     }
 
-    fun getWatchtime(id: UUID, userService: UserService): Int {
+    fun getWatchtime(id: UUID = CurrentUser.currentUserIdMustBeLoggedIn, userService: UserService): Int {
         return broadcastDao.getWatchtime(id, userService)
     }
 
-    fun getShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int {
-        return broadcastDao.getShowWatchtime(id, serializedBroadcast)
+    fun getShowWatchtime(id: UUID = CurrentUser.currentUserIdMustBeLoggedIn, broadcastId: Int, searchType: SearchType): Int {
+        return broadcastDao.getShowWatchtime(id, broadcastId, searchType)
     }
 
-    fun getSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int {
-        return broadcastDao.getSeasonWatchtime(id, serializedBroadcast, season)
+    fun getSeasonWatchtime(id: UUID = CurrentUser.currentUserIdMustBeLoggedIn, broadcastId: Int, searchType: SearchType, season: Int): Int {
+        return broadcastDao.getSeasonWatchtime(id, broadcastId, searchType, season)
     }
 
     fun getTopRated(serializedBroadcast: UserSerializedBroadcast, page: Int): List<Broadcast> {

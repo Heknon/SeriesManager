@@ -1,6 +1,7 @@
 package me.oriharel.seriesmanager.dao.user
 
 import me.oriharel.seriesmanager.api.response.AuthRequest
+import me.oriharel.seriesmanager.dao.broadcast.SearchType
 import me.oriharel.seriesmanager.model.User
 import me.oriharel.seriesmanager.model.content.UserSerializedBroadcast
 import java.util.*
@@ -18,13 +19,15 @@ interface UserDao {
 
     fun getBroadcasts(id: UUID): Optional<Set<UserSerializedBroadcast>>
 
-    fun getBroadcastById(id: UUID, broadcastId: Int): Optional<UserSerializedBroadcast>
+    fun getBroadcastById(id: UUID, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast>
+
+    fun getBroadcastByIdMulti(id: UUID, broadcastId: Int): Optional<List<UserSerializedBroadcast>>
 
     fun addBroadcast(id: UUID, broadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast>
 
-    fun updateBroadcast(id: UUID, broadcastId: Int, broadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast>
+    fun updateBroadcast(id: UUID, broadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast>
 
-    fun deleteBroadcast(id: UUID, broadcastId: Int): Optional<UserSerializedBroadcast>
+    fun deleteBroadcast(id: UUID, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast>
 
     /**
      * Marks specific place in broadcast as watched.
@@ -49,6 +52,8 @@ interface UserDao {
     fun markMovieUnwatched(id: UUID, serializedBroadcast: UserSerializedBroadcast): Boolean {
         return markBroadcastUnwatched(id, serializedBroadcast, 1, 1)
     }
+
+    fun addListToShow(id: UUID, listName: String, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast>
 
     fun generateJwtToken(authRequest: AuthRequest): String
 }

@@ -11,7 +11,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 class EnumConverter : WebMvcConfigurer {
     override fun addFormatters(registry: FormatterRegistry) {
         registry.addConverter(object : Converter<String, SearchType> {
-            override fun convert(str: String): SearchType? {
+            override fun convert(str: String): SearchType {
+                println("str: $str")
+                println(SearchType.valueOf(str.capitalize()))
                 return SearchType.valueOf(str.capitalize())
             }
         })

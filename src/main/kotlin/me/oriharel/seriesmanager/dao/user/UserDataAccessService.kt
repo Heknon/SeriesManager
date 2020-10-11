@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Repository
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
+import java.util.stream.Collectors
 
 @Repository("userDao")
 class UserDataAccessService : UserDao {
@@ -82,12 +83,25 @@ class UserDataAccessService : UserDao {
         return Optional.of(user.get().broadcasts)
     }
 
-    override fun getBroadcastById(id: UUID, broadcastId: Int): Optional<UserSerializedBroadcast> {
+    override fun getBroadcastById(id: UUID, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
         val user = getUserById(id)
         if (user.isEmpty) {
             return Optional.empty()
         }
-        return user.get().broadcasts.stream().filter { it.id == broadcastId }.findFirst()
+        return user.get().broadcasts.stream().filter {
+            it.id == serializedBroadcast.id && it.searchType == serializedBroadcast.searchType
+        }.findFirst()
+    }
+
+    override fun getBroadcastByIdMulti(id: UUID, broadcastId: Int): Optional<List<UserSerializedBroadcast>> {
+        val user = getUserById(id)
+        if (user.isEmpty) {
+            return Optional.empty()
+        }
+
+        return Optional.of(user.get().broadcasts.stream().filter {
+            it.id == broadcastId
+        }.collect(Collectors.toList()))
     }
 
     override fun addBroadcast(id: UUID, broadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
@@ -101,26 +115,26 @@ class UserDataAccessService : UserDao {
         return Optional.of(broadcast)
     }
 
-    override fun updateBroadcast(id: UUID, broadcastId: Int, broadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
+    override fun updateBroadcast(id: UUID, broadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
         val userOptional = getUserById(id)
         if (userOptional.isEmpty) {
             return Optional.empty()
         }
         val user = userOptional.get()
-        user.broadcasts.removeIf { it.id == broadcastId }
-        val bc = UserSerializedBroadcast(broadcastId, broadcast)
+        user.broadcasts.removeIf { it.id == broadcast.id && it.type.equals(broadcast.type, ignoreCase = true) }
+        val bc = UserSerializedBroadcast(broadcast.id!!, broadcast)
         user.broadcasts.add(bc)
         repository.save(user)
         return Optional.of(bc)
     }
 
-    override fun deleteBroadcast(id: UUID, broadcastId: Int): Optional<UserSerializedBroadcast> {
+    override fun deleteBroadcast(id: UUID, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
         val userOptional = getUserById(id)
         if (userOptional.isEmpty) {
             return Optional.empty()
         }
         val user = userOptional.get()
-        val bc = user.broadcasts.filter { it.id == broadcastId }[0]
+        val bc = user.broadcasts.filter { it.id == serializedBroadcast.id && it.type.equals(serializedBroadcast.type, ignoreCase = true) }[0]
         user.broadcasts.remove(bc)
         repository.save(user)
         return Optional.of(bc)
@@ -162,9 +176,16 @@ class UserDataAccessService : UserDao {
         return true
     }
 
+    override fun addListToShow(id: UUID, listName: String, serializedBroadcast: UserSerializedBroadcast): Optional<UserSerializedBroadcast> {
+        val bcOp = getBroadcastById(id, serializedBroadcast)
+        if (bcOp.isEmpty) return Optional.empty()
+        val bc = bcOp.get()
+        bc.lists.add(listName)
+        return updateBroadcast(id, bc)
+    }
+
     override fun generateJwtToken(authRequest: AuthRequest): String {
         try {
-            println()
             authManager.authenticate(UsernamePasswordAuthenticationToken(authRequest.username, authRequest.password))
         } catch (ex: Exception) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password")

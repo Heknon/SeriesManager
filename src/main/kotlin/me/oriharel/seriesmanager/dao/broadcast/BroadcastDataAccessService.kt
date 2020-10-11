@@ -1,6 +1,7 @@
 package me.oriharel.seriesmanager.dao.broadcast
 
 import me.oriharel.seriesmanager.model.content.*
+import me.oriharel.seriesmanager.security.CurrentUser
 import me.oriharel.seriesmanager.service.UserService
 import me.oriharel.seriesmanager.utility.Mapper
 import me.oriharel.seriesmanager.utility.Routes
@@ -18,7 +19,7 @@ class BroadcastDataAccessService : BroadcastDao {
     }
 
     override fun getDetailedBroadcast(serializedBroadcast: UserSerializedBroadcast): Optional<Broadcast> {
-        try {
+        return try {
             val broadcast: Broadcast = when (serializedBroadcast.type) {
                 "movie" -> Routes.TMDB.getMovieEndpoint(serializedBroadcast.id
                         ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "BROADCAST ID IS NULL - BROADCAST: $serializedBroadcast")).convertURLJsonResponse<DetailedMovie>()
@@ -28,9 +29,41 @@ class BroadcastDataAccessService : BroadcastDao {
             }
 
             broadcast.watched = broadcast.broadcastCount <= serializedBroadcast.totalEpisodesWatched
-            return Optional.of(broadcast)
+            if (broadcast is DetailedBroadcast) broadcast.lists = serializedBroadcast.lists
+            Optional.of(broadcast)
         } catch (e: Exception) {
-            return Optional.empty()
+            e.printStackTrace()
+            Optional.empty()
+        }
+    }
+
+    override fun getDetailedBroadcastMulti(broadcastId: Int, userService: UserService): Optional<List<Broadcast>> {
+        return try {
+            val broadcasts: MutableList<Broadcast> = mutableListOf()
+            try {
+                broadcasts.add(Routes.TMDB.getMovieEndpoint(broadcastId).convertURLJsonResponse<DetailedMovie>())
+            } catch (e: Exception) {
+                try {
+                    broadcasts.add(Routes.TMDB.getTVShowEndpoint(broadcastId).convertURLJsonResponse<DetailedTVShow>())
+                } catch (e: Exception) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Broadcast ID. No broadcast exists with given ID.")
+                }
+            }
+
+            if (CurrentUser.isLoggedIn)  {
+                val serialized = userService.getBroadcastByIdMulti(broadcastId = broadcastId).get().associateBy { it.searchType }
+
+                broadcasts.forEach {
+                    if (it is DetailedBroadcast) {
+                        it.watched = it.broadcastCount <= serialized[it.searchType]?.totalEpisodesWatched ?: 0
+                        it.lists = serialized[it.searchType]?.lists
+                    }
+                }
+            }
+            Optional.of(broadcasts)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Optional.empty()
         }
     }
 
@@ -126,8 +159,8 @@ class BroadcastDataAccessService : BroadcastDao {
         return watchtime
     }
 
-    override fun getMaxShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int {
-        val bc = getDetailedBroadcast(serializedBroadcast).get()
+    override fun getMaxShowWatchtime(id: UUID, broadcastId: Int, searchType: SearchType): Int {
+        val bc = getDetailedBroadcast(UserSerializedBroadcast(broadcastId, searchType)).get()
 
         if (bc is DetailedMovie) {
             return bc.runtime
@@ -137,8 +170,8 @@ class BroadcastDataAccessService : BroadcastDao {
         return 0
     }
 
-    override fun getMaxSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int {
-        val bc = getDetailedBroadcast(serializedBroadcast).get()
+    override fun getMaxSeasonWatchtime(id: UUID, broadcastId: Int, searchType: SearchType, season: Int): Int {
+        val bc = getDetailedBroadcast(UserSerializedBroadcast(broadcastId, searchType)).get()
         if (bc is DetailedMovie) {
             return bc.runtime
         } else if (bc is DetailedTVShow) {
@@ -164,22 +197,22 @@ class BroadcastDataAccessService : BroadcastDao {
         return watchtime
     }
 
-    override fun getShowWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast): Int {
-        val bc = getDetailedBroadcast(serializedBroadcast).get()
+    override fun getShowWatchtime(id: UUID, broadcastId: Int, searchType: SearchType): Int {
+        val bc = getDetailedBroadcast(UserSerializedBroadcast(broadcastId, searchType)).get()
         if (bc is DetailedMovie) {
             return bc.runtime
         } else if (bc is DetailedTVShow) {
-            return bc.runtime[0] * (bc.numberOfEpisodes - episodesRemainingInShow(serializedBroadcast))
+            return bc.runtime[0] * (bc.numberOfEpisodes - episodesRemainingInShow(UserSerializedBroadcast(broadcastId, searchType)))
         }
         return 0
     }
 
-    override fun getSeasonWatchtime(id: UUID, serializedBroadcast: UserSerializedBroadcast, season: Int): Int {
-        val bc = getDetailedBroadcast(serializedBroadcast).get()
+    override fun getSeasonWatchtime(id: UUID, broadcastId: Int, searchType: SearchType, season: Int): Int {
+        val bc = getDetailedBroadcast(UserSerializedBroadcast(broadcastId, searchType)).get()
         if (bc is DetailedMovie) {
             return bc.runtime
         } else if (bc is DetailedTVShow) {
-            return bc.runtime[0] * (bc.seasons[season - 1].episodeCount - episodesRemainingInSeason(serializedBroadcast, season.toShort()))
+            return bc.runtime[0] * (bc.seasons[season - 1].episodeCount - episodesRemainingInSeason(UserSerializedBroadcast(broadcastId, searchType), season.toShort()))
         }
         return 0
     }
