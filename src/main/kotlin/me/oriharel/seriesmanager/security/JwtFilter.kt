@@ -1,6 +1,7 @@
 package me.oriharel.seriesmanager.security
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -23,13 +24,16 @@ class JwtFilter : OncePerRequestFilter() {
         var username: String? = null
         var token: String? = null
 
+
+        if (req.requestURI.equals("/api/v1/auth/login", ignoreCase = true)
+                || req.requestURI.equals("/api/v1/auth/register", ignoreCase = true)) return filter.doFilter(req, res)
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7)
             try {
                 username = jwtUtility.extractUsername(token)
             } catch (e: Exception) {
-                res.sendError(1, "Internal Server Error - Cannot validate JWT")
-                throw e
+                res.sendError(HttpStatus.UNAUTHORIZED.value(), e.message)
+                return filter.doFilter(req, res)
             }
         }
 

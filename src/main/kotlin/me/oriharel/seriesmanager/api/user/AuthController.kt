@@ -21,11 +21,11 @@ import javax.validation.constraints.NotNull
 class AuthController @Autowired constructor(private val userService: UserService) {
     @Operation(summary = "Get a JWT access token")
     @PostMapping("/login")
-    fun generateJwtToken(@Valid @NonNull @RequestBody authRequest: AuthRequest): MutableMap<String, String> {
+    fun generateJwtToken(@Valid @NonNull @RequestBody authRequest: AuthRequest): Map<String, Any> {
         if (CurrentUser.isLoggedIn) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Logout in order to login!")
         }
-        return mutableMapOf(Pair("token", userService.generateJwtToken(authRequest)))
+        return mapOf(Pair("token", userService.generateJwtToken(authRequest)), Pair("status", 200))
     }
 
     /**
@@ -40,6 +40,6 @@ class AuthController @Autowired constructor(private val userService: UserService
         }
         val newUser = userService.addUser(user)
         val authReq = AuthRequest(newUser.username, user.password, true)
-        return mutableMapOf(Pair("token", userService.generateJwtToken(authReq)), Pair("user", newUser))
+        return mapOf(Pair("token", userService.generateJwtToken(authReq)), Pair("status", 200), Pair("user", newUser))
     }
 }
